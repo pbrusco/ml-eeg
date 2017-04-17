@@ -1,18 +1,14 @@
 #!/usr/bin/python
 # coding: utf-8
 import numpy as np
-import mne
 import sys
 import configparser
 import collections
 from os.path import expanduser
 from . import system
 import csv
-import os
 
 HOME = expanduser("~")
-
-mne.set_log_level('ERROR')
 
 
 def read_config(filename):
@@ -76,6 +72,10 @@ def read_dat_table(filename, header_filename):
     return data
 
 
+def absolute_to_user_path(filename):
+    return filename.replace(HOME + "/", "~/")
+
+
 def save_list(lines, filename):
     with open(filename, "w") as fn:
         for line in lines:
@@ -87,7 +87,7 @@ def save_list(lines, filename):
 
 def print_inline(str):
     delete = "\b" * (len(str) + 2)
-    print("{0}{1}".format(delete, str), end=' ')
+    print("{0}{1}".format(delete, str))
     sys.stdout.flush()
 
 

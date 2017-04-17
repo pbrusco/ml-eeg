@@ -1,9 +1,9 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import ml.utils
-import ml.data_loading
-import ml.data_import
+from . import utils
+from . import data_loading
+from . import data_import
 import numpy as np
 import mne
 
@@ -37,15 +37,15 @@ def data_for_subject(session_id, speaker_id, conditions, corpora_folder, dummy_t
         development_data_for_condition = data_for_condition_for_subject[:, :, development_ids]
         # control_data_for_condition = data_for_condition_for_subject[:, :, control_ids]
 
-        ml.utils.extend_dict(development_data, condition, development_data_for_condition)
+        utils.extend_dict(development_data, condition, development_data_for_condition)
         # extend_dict(control_data, condition, control_data_for_condition)
 
     return (development_data, control_data, development_epoch_ids)
 
 
 def from_eeglab(session_id, speaker_id, condition, set_files_folder, verbose=True):
-    set_filename = ml.data_loading.set_file_for(session_id, speaker_id, condition, set_files_folder)
-    info, data = ml.data_import.from_eeglab_epochs_setfile(set_filename)
+    set_filename = data_loading.set_file_for(session_id, speaker_id, condition, set_files_folder)
+    info, data = data_import.from_eeglab_epochs_setfile(set_filename)
     if verbose:
         print("{}-{}: {} ({} x {} x {}) (channels x samples x epochs)".format(session_id, speaker_id, condition, info["nchan"], data.shape[1], data.shape[2]))
 
