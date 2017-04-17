@@ -1,4 +1,4 @@
-import lib.system
+import ml.system
 import common
 from interval import Interval
 from wavesurfer import WaveSurfer
@@ -101,7 +101,7 @@ def read(textgrid_file, tier_name):
         lines = codecs.open(textgrid_file, encoding='utf-8').readlines()
     except UnicodeDecodeError:
         print "textgrid file not UTF-8, converting"
-        lib.system.run_command("iconv -f UTF-16 -t UTF-8 {} > tmp; mv tmp {}".format(textgrid_file, textgrid_file))
+        ml.system.run_command("iconv -f UTF-16 -t UTF-8 {} > tmp; mv tmp {}".format(textgrid_file, textgrid_file))
         lines = codecs.open(textgrid_file, encoding='utf-8').readlines()
 
     return TextGridParser(lines, tier_name).parse()

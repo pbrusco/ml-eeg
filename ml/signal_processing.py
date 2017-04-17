@@ -1,5 +1,5 @@
 from pydub import AudioSegment
-import lib.system
+import ml.system
 
 
 def load_wav(filename):
@@ -8,7 +8,7 @@ def load_wav(filename):
 
 def wav_duration(filename):
     # in seconds
-    dur = lib.system.run_command("soxi -D {}".format(filename), verbose=False)
+    dur = ml.system.run_command("soxi -D {}".format(filename), verbose=False)
     dur.strip()
     return float(dur)
 

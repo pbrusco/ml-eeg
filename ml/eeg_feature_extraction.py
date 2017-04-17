@@ -154,7 +154,7 @@ class WindowedExtractor(EEGFeatureExtractor):
         res = {}
         for window_size_in_secs in self.window_sizes:
             ws_frames = int(window_size_in_secs * self.freq)
-            for starting_sample, chunk in lib.signal_processing.sliding_window(dummy_epoch,
+            for starting_sample, chunk in ml.signal_processing.sliding_window(dummy_epoch,
                                                                                window_size_in_frames=ws_frames,
                                                                                step_in_frames=self.step_in_frames,
                                                                                time_limits=self.time_limits,
@@ -162,7 +162,7 @@ class WindowedExtractor(EEGFeatureExtractor):
                                                                                freq=self.freq,
                                                                                ):
                 for ch in self.channels_to_extract_from:
-                    t0, t1 = lib.signal_processing.frame_time_limits(starting_sample, self.freq, self.tmin, ws_frames)
+                    t0, t1 = ml.signal_processing.frame_time_limits(starting_sample, self.freq, self.tmin, ws_frames)
                     res[i] = dict(
                         channel=ch,
                         channel_name=montage.ch_names[ch],

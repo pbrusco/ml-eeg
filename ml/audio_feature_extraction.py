@@ -1,7 +1,7 @@
 # coding: utf-8
 import feature_extraction
 import collections
-import lib.system
+import ml.system
 import arff
 import numpy as np
 import scipy.stats
@@ -30,7 +30,7 @@ class AcousticsExtractor(AudioExtractor):
         self.temp_folder = "/tmp/opensmile_arffs/"
         self.extended_features = params["extended_features"]
         self.extract_on_last_seconds = params["extract_on_last_seconds"]
-        lib.system.mkdir_p(self.temp_folder)
+        ml.system.mkdir_p(self.temp_folder)
 
     def extract(self, instance):
         last_seconds_values = self.extract_on_last_seconds
@@ -127,7 +127,7 @@ class AcousticsExtractor(AudioExtractor):
         script_path = os.path.dirname(inspect.getfile(inspect.currentframe())) + "/voice-analysis.praat"
         try:
             script_path = os.path.dirname(inspect.getfile(inspect.currentframe())) + "/voice-analysis-voiced.praat"
-            output = lib.system.run_external_command("praat {}".format(script_path), non_named_params=[instance.filename, start, end, min_pitch, max_pitch])
+            output = ml.system.run_external_command("praat {}".format(script_path), non_named_params=[instance.filename, start, end, min_pitch, max_pitch])
             values = dict([o.split(":") for o in output.split()])
             jitter = float(values["sound_voiced_local_jitter"]) if "undefined" not in values["sound_voiced_local_jitter"] else np.nan
             shimmer = float(values["sound_voiced_local_shimmer"]) if "undefined" not in values["sound_voiced_local_shimmer"] else np.nan
@@ -161,9 +161,9 @@ class AcousticsExtractor(AudioExtractor):
         timestamp = time.time()
         temp_output = "{}/{}{}.arff".format(self.temp_folder, timestamp, os.path.basename(filename))
         data = {}
-        lib.system.run_command("SMILExtract -C {} -I {} -l 0 -arffoutput {} -appendarff 0".format(config, filename, temp_output))
+        ml.system.run_command("SMILExtract -C {} -I {} -l 0 -arffoutput {} -appendarff 0".format(config, filename, temp_output))
         data = arff.load(open(temp_output, 'rb'))
-        lib.system.rm(temp_output)
+        ml.system.rm(temp_output)
         return data
 
     def get_column(self, data, column_name):
