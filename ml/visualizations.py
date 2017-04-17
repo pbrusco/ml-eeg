@@ -7,7 +7,7 @@ import matplotlib.patches as patches
 import numpy as np
 from sklearn import metrics
 import seaborn as sns
-from . import signal_processing
+import signal_processing
 import mne
 from IPython.display import display
 

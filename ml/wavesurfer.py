@@ -1,5 +1,5 @@
 from .interval import Interval
-from . import system
+import system
 
 
 class WaveSurfer():

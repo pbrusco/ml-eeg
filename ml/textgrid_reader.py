@@ -1,4 +1,4 @@
-from . import system
+import system
 from .interval import Interval
 from .wavesurfer import WaveSurfer
 import re

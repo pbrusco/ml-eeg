@@ -1,5 +1,5 @@
 from pydub import AudioSegment
-from . import system
+import system
 
 
 def load_wav(filename):

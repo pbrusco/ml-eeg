@@ -1,7 +1,7 @@
 # coding: utf-8
-from . import feature_extraction
+import feature_extraction
 import collections
-from . import system
+import system
 import arff
 import numpy as np
 import scipy.stats

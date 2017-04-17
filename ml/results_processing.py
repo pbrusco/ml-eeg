@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # coding: utf-8
 import pickle
-from . import system
+import system
 import numpy as np
 from sklearn import metrics
 from pandas import DataFrame

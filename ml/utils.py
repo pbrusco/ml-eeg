@@ -5,7 +5,7 @@ import sys
 import configparser
 import collections
 from os.path import expanduser
-from . import system
+import system
 import csv
 
 HOME = expanduser("~")
@@ -87,7 +87,8 @@ def save_list(lines, filename):
 
 def print_inline(str):
     delete = "\b" * (len(str) + 2)
-    print("{0}{1}".format(delete, str))
+    txt = "{0}{1}".format(delete, str)
+    print(txt, end=" ")
     sys.stdout.flush()
 
 

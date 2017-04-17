@@ -1,8 +1,8 @@
-from . import signal_processing
+import signal_processing
 import numpy as np
 from scipy import signal
 import mne
-from . import feature_extraction
+import feature_extraction
 
 
 class EEGFeatureExtractor(feature_extraction.FeatureExtractor):

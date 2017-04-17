@@ -3,7 +3,7 @@
 import sklearn.cross_validation
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
-from . import utils
+import utils
 # import custom_hmm
 
 
