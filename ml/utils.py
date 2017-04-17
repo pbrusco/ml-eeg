@@ -1,5 +1,7 @@
 #!/usr/bin/python
 # coding: utf-8
+from __future__ import print_function
+
 import numpy as np
 import sys
 import configparser
@@ -88,7 +90,9 @@ def save_list(lines, filename):
 def print_inline(str):
     delete = "\b" * (len(str) + 2)
     txt = "{0}{1}".format(delete, str)
+
     print(txt, end=" ")
+
     sys.stdout.flush()
 
 
