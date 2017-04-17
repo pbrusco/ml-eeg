@@ -22,7 +22,7 @@ class RawExtractor(EEGFeatureExtractor):
         super(RawExtractor, self).__init__(params)
 
     def extract(self, trial):
-        assert self.n_channels == trial.shape[0], "check trial shape (channels x samples)"
+        assert self.n_channels == trial.shape[0], "the number of channels in the extractor configuration doen't match {} vs {}".format(self.n_channels, trial.shape[0])
         ti, tf = self.time_limits
 
         initial_frame = int((ti - self.tmin) * self.freq)
@@ -36,7 +36,7 @@ class TrashExtractor(EEGFeatureExtractor):
         super(TrashExtractor, self).__init__(params)
 
     def extract(self, trial):
-        assert self.n_channels == trial.shape[0], "check trial shape (channels x samples)"
+        assert self.n_channels == trial.shape[0], "the number of channels in the extractor configuration doen't match {} vs {}".format(self.n_channels, trial.shape[0])
         ti, tf = self.time_limits
 
         initial_frame = int((ti - self.tmin) * self.freq)
@@ -54,7 +54,7 @@ class FreqExtractor(EEGFeatureExtractor):
         self.max_freq = params["max_freq"]
 
     def extract(self, trial):
-        assert self.n_channels == trial.shape[0], "check trial shape (channels x samples)"
+        assert self.n_channels == trial.shape[0], "the number of channels in the extractor configuration doen't match {} vs {}".format(self.n_channels, trial.shape[0])
         ti, tf = self.time_limits
 
         initial_frame = int((ti - self.tmin) * self.freq)
@@ -123,7 +123,7 @@ class WindowedExtractor(EEGFeatureExtractor):
 
     def extract(self, trial):
         # Trial shape: (channels x samples)
-        assert self.n_channels == trial.shape[0], "check trial shape (channels x samples)"
+        assert self.n_channels == trial.shape[0], "the number of channels in the extractor configuration doen't match {} vs {}".format(self.n_channels, trial.shape[0])
         features = []
         for window_size_in_secs in self.window_sizes:
             ws_frames = int(window_size_in_secs * self.freq)

@@ -127,28 +127,6 @@ def count_if(f, values):
     return len([0 for v in values if f(v)])
 
 
-def mappings():
-    res = {}
-    res["List_Speak"] = dict(listening_H=1, listening_S=1, listening_BC=1,
-                             speaking_H=0, speaking_S=0, speaking_BC=0)
-
-    res["H_S_listening"] = dict(listening_H=1, listening_S=0, listening_BC=None,
-                                speaking_H=None, speaking_S=None, speaking_BC=None)
-
-    res["H_S_speaking"] = dict(listening_H=None, listening_S=None, listening_BC=None,
-                               speaking_H=1, speaking_S=0, speaking_BC=None)
-
-    res["List_Speak_switch"] = dict(listening_H=None, listening_S=1, listening_BC=None,
-                                    speaking_H=None, speaking_S=0, speaking_BC=None)
-
-    res["List_Speak_hold"] = dict(listening_H=1, listening_S=None, listening_BC=None,
-                                  speaking_H=0, speaking_S=None, speaking_BC=None)
-
-    res["List_Speak_no_bc"] = dict(listening_H=1, listening_S=1, listening_BC=None,
-                                   speaking_H=0, speaking_S=0, speaking_BC=None)
-    return res
-
-
 def apply_mapping_to_data(X, y, categories_mapping):
     mapped_y = np.array([categories_mapping[y_i] for y_i in y])
     X_filtered = X[mapped_y != np.array(None), :]
