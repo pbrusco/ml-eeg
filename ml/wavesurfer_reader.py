@@ -1,4 +1,4 @@
-from . import common
+from . import system
 from .interval import Interval
 from .wavesurfer import WaveSurfer
 
@@ -38,7 +38,7 @@ def read(wavesurfer_file):
     # 0.52 1.12 Bye
     # Returns a list of intervals: [I(t0, t1, val1), I(t1, t2, val2), ...]
     # Time values are parsed as floats.
-    if not common.exists(wavesurfer_file):
+    if not system.exists(wavesurfer_file):
         raise Exception("Missing file: " + wavesurfer_file)
 
     with open(wavesurfer_file, "r") as file:

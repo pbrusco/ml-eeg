@@ -29,16 +29,13 @@ def read_config(filename):
 def read_list(filename):
     if not system.exists(filename):
         raise Exception("missing list: {}".format(filename))
-    abspath = os.path.abspath(filename)
-    dirpath = os.path.dirname(abspath)
 
-    file = open(abspath, "r")
+    file = open(filename, "r")
 
     lines = file.readlines()
     for line in lines:
         if line.strip() != "":
             l = line.replace("~/", HOME + "/")
-            l = l.replace("./", dirpath + "/")
             yield l.split()
 
 
@@ -179,3 +176,7 @@ def subsample_ids(y):
 def unzip(arr):
     lst1, lst2 = list(zip(*arr))
     return list(lst1), list(lst2)
+
+
+def flatten(list_of_lists):
+    return [e for l in list_of_lists for e in l]

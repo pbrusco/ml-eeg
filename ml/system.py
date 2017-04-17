@@ -2,10 +2,15 @@
 import os
 import os.path
 import subprocess
+from time import gmtime, strftime
 
 
 def home():
     return os.path.expanduser("~")
+
+
+def now():
+    return strftime("%Y-%m-%d-%H:%M:%S", gmtime())
 
 
 def mkdir_p(directory):

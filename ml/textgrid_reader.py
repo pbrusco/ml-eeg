@@ -1,9 +1,8 @@
-import ml.system
-from . import common
+from . import system
 from .interval import Interval
 from .wavesurfer import WaveSurfer
 import re
-from IPython import embed
+
 import codecs
 
 
@@ -95,13 +94,13 @@ class TextGridParser:
 
 
 def read(textgrid_file, tier_name):
-    if not common.exists(textgrid_file):
+    if not system.exists(textgrid_file):
         raise Exception("Missing file: " + textgrid_file)
     try:
         lines = codecs.open(textgrid_file, encoding='utf-8').readlines()
     except UnicodeDecodeError:
         print("textgrid file not UTF-8, converting")
-        ml.system.run_command("iconv -f UTF-16 -t UTF-8 {} > tmp; mv tmp {}".format(textgrid_file, textgrid_file))
+        system.run_command("iconv -f UTF-16 -t UTF-8 {} > tmp; mv tmp {}".format(textgrid_file, textgrid_file))
         lines = codecs.open(textgrid_file, encoding='utf-8').readlines()
 
     return TextGridParser(lines, tier_name).parse()

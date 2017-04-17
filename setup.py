@@ -23,7 +23,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='17.04.03',
+    version='17.04.04',
 
     description='A ml & eeg helper library',
     long_description=long_description,
