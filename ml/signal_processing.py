@@ -26,7 +26,7 @@ def sliding_window(sequence, window_size_in_frames, step_in_frames, time_limits,
             continue
         if debugging:
             step_in_secs = step_in_frames * frame_duration
-            print "frame index:", i, "from:", frame_initial_time, "to:", frame_end_time, "next should be:", frame_initial_time + step_in_secs, "step:", step_in_secs
+            print("frame index:", i, "from:", frame_initial_time, "to:", frame_end_time, "next should be:", frame_initial_time + step_in_secs, "step:", step_in_secs)
         yield i, sequence[:, i:i + window_size_in_frames]
 
 

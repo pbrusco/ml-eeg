@@ -26,7 +26,7 @@ def data_for_subject(session_id, speaker_id, conditions, corpora_folder, dummy_t
     for condition in conditions:
         data_for_condition_for_subject = from_eeglab(session_id, speaker_id, condition, corpora_folder, verbose=verbose)  # channels x samples x epochs
         if dummy_test:
-            print "generating random data"
+            print("generating random data")
             data_for_condition_for_subject = np.random.random(data_for_condition_for_subject.shape) + (conditions.index(condition) * 20)
 
         n_epochs = data_for_condition_for_subject.shape[2]
@@ -47,7 +47,7 @@ def from_eeglab(session_id, speaker_id, condition, set_files_folder, verbose=Tru
     set_filename = ml.data_loading.set_file_for(session_id, speaker_id, condition, set_files_folder)
     info, data = ml.data_import.from_eeglab_epochs_setfile(set_filename)
     if verbose:
-        print "{}-{}: {} ({} x {} x {}) (channels x samples x epochs)".format(session_id, speaker_id, condition, info["nchan"], data.shape[1], data.shape[2])
+        print("{}-{}: {} ({} x {} x {}) (channels x samples x epochs)".format(session_id, speaker_id, condition, info["nchan"], data.shape[1], data.shape[2]))
 
     return data
 
@@ -74,6 +74,6 @@ def add_events(session_id, speaker_id, conditions, condition, set_files_folder, 
     mne_data.events = events
 
     if verbose:
-        print "s{}-{}: {}".format(session_id, speaker_id, condition)
+        print("s{}-{}: {}".format(session_id, speaker_id, condition))
 
     return mne_data

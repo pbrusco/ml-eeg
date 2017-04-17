@@ -7,7 +7,7 @@ import matplotlib.patches as patches
 import numpy as np
 from sklearn import metrics
 import seaborn as sns
-import signal_processing
+from . import signal_processing
 import mne
 from IPython.display import display
 
@@ -17,7 +17,7 @@ def plot_roc_curve(exp_results, roc_title, folds, classifier, ax, permutation, f
     all_actuals = []
     all_probs = []
 
-    for i in classifier_results.keys():
+    for i in list(classifier_results.keys()):
         actual = exp_results["results"][classifier][i]["actual"]
         predicted_probabilities = exp_results["results"][classifier][i]["predicted_probabilities"]
 
@@ -121,7 +121,7 @@ def plot_epochs_comparition(data_dict, y_lim, tmin, window, freq, marks, epochs_
     tf_frame = signal_processing.frame_at(tf, freq, tmin)
     plt.figure()
 
-    for condition in data_dict.keys():
+    for condition in list(data_dict.keys()):
         epochs_mean = data_dict[condition][:, t0_frame:tf_frame, 0:epochs_max_number].mean(2)
         samples = epochs_mean.shape[1]
 

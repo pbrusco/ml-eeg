@@ -1,5 +1,5 @@
 # coding: utf-8
-import feature_extraction
+from . import feature_extraction
 import collections
 import ml.system
 import arff
@@ -133,7 +133,7 @@ class AcousticsExtractor(AudioExtractor):
             shimmer = float(values["sound_voiced_local_shimmer"]) if "undefined" not in values["sound_voiced_local_shimmer"] else np.nan
             nhr = float(values["noise_to_harmonics_ratio"]) if "undefined" not in values["noise_to_harmonics_ratio"] else np.nan
         except:
-            print "No voiced frames on range {}-{}".format(start, end)
+            print("No voiced frames on range {}-{}".format(start, end))
             jitter = np.nan
             shimmer = np.nan
             nhr = np.nan

@@ -31,4 +31,4 @@ def sys_call(command, testing=False):
 
 
 def show(label, data):
-    print(label + ": " + str(data))
+    print((label + ": " + str(data)))

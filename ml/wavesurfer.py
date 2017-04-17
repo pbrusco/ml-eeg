@@ -1,5 +1,5 @@
-from interval import Interval
-import system
+from .interval import Interval
+from . import system
 
 
 class WaveSurfer():
@@ -29,7 +29,7 @@ class WaveSurfer():
 
             if interval.value != self.current().value:
                 differences.append((self.counter + 1, interval.start, interval.end))
-            self.next()
+            next(self)
 
         return differences
 
@@ -60,7 +60,7 @@ class WaveSurfer():
 
     def next_until(self, time):
         if self.current().end < time and self.has_next():
-            self.next()
+            next(self)
             return self.next_until(time)
         else:
             return self.current()

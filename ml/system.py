@@ -34,14 +34,14 @@ def rm(filename):
 def run_command(cmd, skip=False, verbose=True):
     if verbose:
         if not skip:
-            print('\n (running) \x1b[2;32;40m' + cmd + '\x1b[0m')
+            print(('\n (running) \x1b[2;32;40m' + cmd + '\x1b[0m'))
         else:
-            print('\n (skiping) \x1b[2;33;40m' + cmd + '\x1b[0m')
+            print(('\n (skiping) \x1b[2;33;40m' + cmd + '\x1b[0m'))
     if not skip:
         try:
             return subprocess.check_output(cmd, shell=True)
         except subprocess.CalledProcessError as e:
-            print('\n \x1b[2;31;40m (ERROR)' + cmd + '\x1b[0m')
+            print(('\n \x1b[2;31;40m (ERROR)' + cmd + '\x1b[0m'))
             raise e
 
 
@@ -58,7 +58,7 @@ def run_external_command(cmd, **args):
     else:
         no_named = ""
 
-    for (arg, val) in args.iteritems():
+    for (arg, val) in args.items():
         cmd += " --{} {}".format(arg, val)
 
     cmd += no_named
@@ -77,27 +77,27 @@ def run_script(module, **args):
     else:
         skip = False
 
-    for (arg, val) in args.iteritems():
+    for (arg, val) in args.items():
         cmd += " --{} '{}'".format(arg, val)
 
     if skip:
-        print('\n (skiping) \x1b[2;33;40m' + cmd + '\x1b[0m')
+        print(('\n (skiping) \x1b[2;33;40m' + cmd + '\x1b[0m'))
     else:
-        print('\n (running) \x1b[2;32;40m' + cmd + '\x1b[0m')
+        print(('\n (running) \x1b[2;32;40m' + cmd + '\x1b[0m'))
         try:
             module.main(**args)
         except Exception:
-            print "Error running {} with args {}".format(module.__name__, args)
+            print("Error running {} with args {}".format(module.__name__, args))
             raise
 
 
 def warning(message):
-    print('\n (WARNING) \x1b[2;33;40m' + message + '\x1b[0m')
+    print(('\n (WARNING) \x1b[2;33;40m' + message + '\x1b[0m'))
 
 
 def error(message):
-    print('\n (ERROR) \x1b[2;31;43m' + message + '\x1b[0m')
+    print(('\n (ERROR) \x1b[2;31;43m' + message + '\x1b[0m'))
 
 
 def info(message):
-    print('\n (INFO) \x1b[2;32;40m' + message + '\x1b[0m')
+    print(('\n (INFO) \x1b[2;32;40m' + message + '\x1b[0m'))

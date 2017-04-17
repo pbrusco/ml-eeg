@@ -12,8 +12,8 @@ class FeatureExtractor(object):
     def batch_extract(self, instances_list):
         raise NotImplementedError("{} must implement the 'extract_batch' method".format(self))
 
-import eeg_feature_extraction
-import audio_feature_extraction
+from . import eeg_feature_extraction
+from . import audio_feature_extraction
 
 
 def create(**params):

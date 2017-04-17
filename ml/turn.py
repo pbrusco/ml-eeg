@@ -1,4 +1,4 @@
-from equality import EqualityMixin
+from .equality import EqualityMixin
 
 
 class Turn(EqualityMixin):
@@ -30,7 +30,7 @@ def is_silence(interval):
 
 def intervals_between(t0, t1, vad):
 
-    return filter(lambda interval: interval.start <= t1 and interval.end >= t0, vad)
+    return [interval for interval in vad if interval.start <= t1 and interval.end >= t0]
 
 
 def next_turn(vad, speaker2_vad):
@@ -47,7 +47,7 @@ def next_turn(vad, speaker2_vad):
         if not vad.has_next():
             return Turn(start, vad.current().end, intervals)
 
-        next_interval = vad.next()
+        next_interval = next(vad)
 
         if is_silence(next_interval):
             overlaped_intervals = intervals_between(next_interval.start, next_interval.end, speaker2_vad)

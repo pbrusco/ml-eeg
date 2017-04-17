@@ -1,7 +1,7 @@
 import ml.system
-import common
-from interval import Interval
-from wavesurfer import WaveSurfer
+from . import common
+from .interval import Interval
+from .wavesurfer import WaveSurfer
 import re
 from IPython import embed
 import codecs
@@ -100,7 +100,7 @@ def read(textgrid_file, tier_name):
     try:
         lines = codecs.open(textgrid_file, encoding='utf-8').readlines()
     except UnicodeDecodeError:
-        print "textgrid file not UTF-8, converting"
+        print("textgrid file not UTF-8, converting")
         ml.system.run_command("iconv -f UTF-16 -t UTF-8 {} > tmp; mv tmp {}".format(textgrid_file, textgrid_file))
         lines = codecs.open(textgrid_file, encoding='utf-8').readlines()
 

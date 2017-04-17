@@ -3,7 +3,7 @@
 import sklearn.cross_validation
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
-import utils
+from . import utils
 # import custom_hmm
 
 
@@ -13,7 +13,7 @@ class ClassificationHelper(object):
             self.classifier = classifier
         else:
             self.classifier = self._build_classifier_from(classifier_name, seed=seed)
-            print "Using {} classifier".format(self.classifier)
+            print("Using {} classifier".format(self.classifier))
 
         self.classifier_name = classifier_name
         self.classes = classes
@@ -54,7 +54,7 @@ class ClassificationHelper(object):
         counts = [sum(y == c) for c in self.classes]
 
         if verbose:
-            print "running classifiers for", zip(self.classes, counts)
+            print("running classifiers for", list(zip(self.classes, counts)))
         folds = sklearn.cross_validation.StratifiedKFold(y, n_folds=n_folds, random_state=seed)
 
         results = {}

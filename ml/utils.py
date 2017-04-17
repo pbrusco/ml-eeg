@@ -3,10 +3,10 @@
 import numpy as np
 import mne
 import sys
-import ConfigParser
+import configparser
 import collections
 from os.path import expanduser
-import system
+from . import system
 import csv
 import os
 
@@ -18,7 +18,7 @@ mne.set_log_level('ERROR')
 def read_config(filename):
     if not system.exists(filename):
         raise Exception("missing config: {}".format(filename))
-    config = ConfigParser.SafeConfigParser()
+    config = configparser.SafeConfigParser()
     config.read([filename])
     res = collections.defaultdict(str)
     for k, v in config.items("DEFAULT"):
@@ -62,7 +62,7 @@ def read_csv(filename, delimiter=","):
             if i == 0:
                 header = row
             else:
-                res.append(dict(zip(header, row)))
+                res.append(dict(list(zip(header, row))))
     return res
 
 
@@ -74,7 +74,7 @@ def read_dat_table(filename, header_filename):
     data = []
     with open(filename, "r") as data_file:
         for line in data_file:
-            row = dict(zip(header, line.strip().split("\t")))
+            row = dict(list(zip(header, line.strip().split("\t"))))
             data.append(row)
     return data
 
@@ -90,16 +90,16 @@ def save_list(lines, filename):
 
 def print_inline(str):
     delete = "\b" * (len(str) + 2)
-    print "{0}{1}".format(delete, str),
+    print("{0}{1}".format(delete, str), end=' ')
     sys.stdout.flush()
 
 
 def call_with_necesary_params_only(fn, params):
-    arg_count = fn.func_code.co_argcount
-    args = fn.func_code.co_varnames[:arg_count]
+    arg_count = fn.__code__.co_argcount
+    args = fn.__code__.co_varnames[:arg_count]
 
     args_dict = {}
-    for k, v in params.iteritems():
+    for k, v in params.items():
         if k in args:
             args_dict[k] = v
 
@@ -157,7 +157,7 @@ def apply_mapping_to_data(X, y, categories_mapping):
 
 def compare_intersection(y_1, y_2):
     intersection = sum([1 if y else 0 for y in (y_1 == y_2)])
-    print "permutation intersection: {}%".format(round((100.0 * intersection) / len(y_2), 2))
+    print("permutation intersection: {}%".format(round((100.0 * intersection) / len(y_2), 2)))
     return intersection
 
 
@@ -166,7 +166,7 @@ def subsample_ids(y):
     ids = []
     min_count = min(counts.values())
 
-    counts = dict([(label, 0) for label in counts.keys()])
+    counts = dict([(label, 0) for label in list(counts.keys())])
     for idx, label in enumerate(y):
         if counts[label] >= min_count:
             continue
@@ -177,5 +177,5 @@ def subsample_ids(y):
 
 
 def unzip(arr):
-    lst1, lst2 = zip(*arr)
+    lst1, lst2 = list(zip(*arr))
     return list(lst1), list(lst2)

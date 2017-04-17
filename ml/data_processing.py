@@ -10,7 +10,7 @@ def handle_nans(nan_action, X, features_names):
     if nan_action == "remove":
         nan_rows = np.isnan(X).any(axis=1)
         X = X[~nan_rows, :]
-        print "FILTERNING NaN rows"
+        print("FILTERNING NaN rows")
         deleted_rows = nan_rows
 
     if nan_action in ["replace_by_zero", "replace_by_mean", "replace_by_median"]:
@@ -18,7 +18,7 @@ def handle_nans(nan_action, X, features_names):
         features_names = features_names + ["was_nan" + f for f in features_names]
 
     if nan_action == "replace_by_zero":
-        print "converting {} NaN to 0s".format(np.count_nonzero(~np.isnan(X)))
+        print("converting {} NaN to 0s".format(np.count_nonzero(~np.isnan(X))))
         X = np.nan_to_num(X)
         deleted_rows = np.array([])
 

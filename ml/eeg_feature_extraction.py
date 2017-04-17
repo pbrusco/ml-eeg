@@ -1,8 +1,8 @@
-import signal_processing
+from . import signal_processing
 import numpy as np
 from scipy import signal
 import mne
-import feature_extraction 
+from . import feature_extraction 
 
 
 class EEGFeatureExtractor(feature_extraction.FeatureExtractor):
@@ -14,7 +14,7 @@ class EEGFeatureExtractor(feature_extraction.FeatureExtractor):
         self.channels_to_extract_from = list(params["channels_to_extract_from"])
         self.verbose = params["verbose"] if ("verbose" in params) else None
         if self.verbose:
-            print params
+            print(params)
 
 
 class RawExtractor(EEGFeatureExtractor):
@@ -128,7 +128,7 @@ class WindowedExtractor(EEGFeatureExtractor):
         for window_size_in_secs in self.window_sizes:
             ws_frames = int(window_size_in_secs * self.freq)
             if self.verbose:
-                print "ws frames: ", ws_frames
+                print("ws frames: ", ws_frames)
             for starting_sample, chunk in signal_processing.sliding_window(trial,
                                                                                window_size_in_frames=ws_frames,
                                                                                step_in_frames=self.step_in_frames,

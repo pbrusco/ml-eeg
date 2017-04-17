@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # coding: utf-8
 import pickle
-import system
+from . import system
 import numpy as np
 from sklearn import metrics
 from pandas import DataFrame
@@ -21,7 +21,7 @@ def analize(results, experiment, measures):
         measure_result, support = results_extractor(result, measure_function, permutation=False)
         processed_result[measure_name] = measure_result
 
-        permutation_keys = [k for k in results.keys() if k.endswith("_permutation")]
+        permutation_keys = [k for k in list(results.keys()) if k.endswith("_permutation")]
         if len(permutation_keys) > 1:
             perm_results = [results_extractor(results[p], measure_function, permutation=True)[0] for p in permutation_keys]
             # processed_result[measure_name + "_perc_05"] = np.percentile(perm_results, 05)
@@ -45,7 +45,7 @@ def compare_subjects(sessions, results_folder, measures, experiments, warnings=T
             for experiment in experiments:
                 results = classification_results_for(session_id, subject, results_folder, experiment)
                 if not results:
-                    print "no results found for", (session_id, subject, results_folder, experiment)
+                    print("no results found for", (session_id, subject, results_folder, experiment))
                     continue
                 row = analize(results, experiment, measures)
                 row.update({"session": subject_session})
@@ -69,14 +69,14 @@ def accuracy_fn(actual, predicted_probabilities, categories):
 
 def results_extractor(results, measure, permutation):
     categories = results["categories"]
-    classifier_results = results["results"][results["results"].keys()[0]]
+    classifier_results = results["results"][list(results["results"].keys())[0]]
 
     supports = []
     all_actuals = []
     all_predicted_probabilities = []
     all_feature_importances = []
 
-    for i in classifier_results.keys():
+    for i in list(classifier_results.keys()):
         res_fold_i = classifier_results[i]
         actual = res_fold_i["actual"]
         predicted_probabilities = res_fold_i["predicted_probabilities"]
@@ -91,14 +91,14 @@ def results_extractor(results, measure, permutation):
     measure_result = measure(all_actuals, all_predicted_probabilities, categories)
     support = np.sum(supports, axis=0)
 
-    return measure_result, zip(categories, support)
+    return measure_result, list(zip(categories, support))
 
 
 def feature_importances(results):
-    classifier_results = results["results"][results["results"].keys()[0]]
+    classifier_results = results["results"][list(results["results"].keys())[0]]
     all_feature_importances = []
 
-    for i in classifier_results.keys():
+    for i in list(classifier_results.keys()):
         res_fold_i = classifier_results[i]
         all_feature_importances.append(res_fold_i["classifier_weights"])
 

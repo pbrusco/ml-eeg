@@ -1,6 +1,6 @@
-import common
-from interval import Interval
-from wavesurfer import WaveSurfer
+from . import common
+from .interval import Interval
+from .wavesurfer import WaveSurfer
 
 
 class ParseError(Exception):

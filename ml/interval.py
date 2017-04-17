@@ -1,4 +1,4 @@
-from equality import EqualityMixin
+from .equality import EqualityMixin
 
 
 class Interval(EqualityMixin):
