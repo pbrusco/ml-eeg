@@ -7,7 +7,7 @@ import sys
 import configparser
 import collections
 from os.path import expanduser
-import system
+from . import system
 import csv
 
 HOME = expanduser("~")
@@ -81,13 +81,15 @@ def absolute_to_user_path(filename):
     return filename.replace(HOME + "/", "~/")
 
 
-def save_list(lines, filename):
+def save_list(lines, filename, verbose=True):
     with open(filename, "w") as fn:
         for line in lines:
             if type(line) is list or type(line) is tuple:
                 fn.write("\t".join(line) + "\n")
             else:
                 fn.write(line + "\n")
+    if verbose:
+        system.info("output list saved at {}".format(filename))
 
 
 def print_inline(str):
