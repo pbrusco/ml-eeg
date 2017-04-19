@@ -30,11 +30,14 @@ def read_list(filename):
 
     file = open(filename, "r")
 
+    res = []
     lines = file.readlines()
     for line in lines:
         if line.strip() != "":
             l = line.replace("~/", HOME + "/")
-            yield l.split()
+            res.append(l.split())
+
+    return list(res)
 
 
 def read_wavesurfer(filename):
