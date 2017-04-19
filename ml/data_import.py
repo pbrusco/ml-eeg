@@ -2,7 +2,6 @@
 # coding: utf-8
 
 import mne
-mne.set_log_level("WARNING")
 
 
 def from_eeglab_epochs_setfile(set_filename):
