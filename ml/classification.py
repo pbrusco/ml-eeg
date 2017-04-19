@@ -4,21 +4,20 @@ import sklearn.cross_validation
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from . import utils
-# import custom_hmm
 
 
 class ClassificationHelper(object):
-    def __init__(self, classifier_name, classes=[0, 1], classifier=None, seed=1234):
+    def __init__(self, config, classes=[0, 1], classifier=None, seed=1234):
         if classifier:
             self.classifier = classifier
         else:
-            self.classifier = self._build_classifier_from(classifier_name, seed=seed)
+            self.classifier = self._build_classifier_from(config, seed=seed)
             print("Using {} classifier".format(self.classifier))
 
-        self.classifier_name = classifier_name
+        self.classifier_name = config["classifier_name"]
         self.classes = classes
 
-    def _build_classifier_from(self, classifier_name, seed=1234):
+    def _build_classifier_from(self, config, seed=1234):
         classifiers = {"SVM": SVC(kernel="linear", probability=True, C=1, class_weight='balanced'),  # Balanced da pesos según cantidad de instancias
                        "SVMG": SVC(kernel='rbf', probability=True, gamma=0.7, C=1, class_weight='balanced'),
                        "RF10": RandomForestClassifier(n_estimators=10, criterion='gini', n_jobs=-1, random_state=seed, class_weight='balanced'),
@@ -26,7 +25,7 @@ class ClassificationHelper(object):
                        "RF1000": RandomForestClassifier(n_estimators=1000, criterion='gini', n_jobs=-1, random_state=seed, class_weight='balanced'),
                        }
 
-        return classifiers[classifier_name]
+        return classifiers[config["classifier_name"]]
 
     def classification_probas(self, X_train, y_train, X_test, seed=1234):
         self.classifier.fit(X_train, y_train)
