@@ -1,6 +1,6 @@
 import system
-from .interval import Interval
-from .wavesurfer import WaveSurfer
+from . import interval
+from . import wavesurfer
 import re
 
 import codecs
@@ -66,31 +66,31 @@ class TextGridParser:
             if classs.startswith("TextTier"):
                 continue
 
-            assert_is("xmin", lines[i]); i+= 1
-            assert_is("xmax", lines[i]); i+= 1
+            assert_is("xmin", lines[i]); i += 1
+            assert_is("xmax", lines[i]); i += 1
             n_intervals = int(get("intervals: size", lines[i])); i += 1
 
             for interval_id in range(0, n_intervals):
-                assert_is("intervals", lines[i]); i+= 1
+                assert_is("intervals", lines[i]); i += 1
                 xmin = get("xmin", lines[i]); i += 1
                 xmax = get("xmax", lines[i]); i += 1
                 text = get("text", lines[i]); i += 1
                 intervals[name].append((float(xmin), float(xmax), text))
 
         def as_interval(y):
-            return Interval(y[0], y[1], y[2])
+            return interval.Interval(y[0], y[1], y[2])
 
         res = []
         for v in intervals[self.tier_name]:
-            interval = as_interval(v)
-            if interval.start != self.lastEnd or interval.end < self.lastEnd:
+            i = as_interval(v)
+            if i.start != self.lastEnd or i.end < self.lastEnd:
                 raise ParseError("Missing time values")
             else:
-                self.lastEnd = interval.end
+                self.lastEnd = i.end
 
-            res.append(interval)
+            res.append(i)
 
-        return WaveSurfer(res)
+        return wavesurfer.WaveSurfer(res)
 
 
 def read(textgrid_file, tier_name):

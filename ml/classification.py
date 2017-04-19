@@ -3,7 +3,7 @@
 import sklearn.cross_validation
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
-import utils
+from . import utils
 # import custom_hmm
 
 
@@ -24,7 +24,6 @@ class ClassificationHelper(object):
                        "RF10": RandomForestClassifier(n_estimators=10, criterion='gini', n_jobs=-1, random_state=seed, class_weight='balanced'),
                        "RF100": RandomForestClassifier(n_estimators=100, criterion='gini', n_jobs=-1, random_state=seed, class_weight='balanced'),
                        "RF1000": RandomForestClassifier(n_estimators=1000, criterion='gini', n_jobs=-1, random_state=seed, class_weight='balanced'),
-                       #    "HMM": custom_hmm.ClassificationHMM(),
                        }
 
         return classifiers[classifier_name]

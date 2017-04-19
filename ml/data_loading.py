@@ -1,14 +1,12 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import utils
-import data_import
+from . import utils
+from . import data_import
 import numpy as np
-import mne
+
 
 # Specific data-loading for this project
-
-
 def set_file_for(session_id, speaker_id, condition, set_files_folder):
     return set_files_folder + "/set-trimmed-trials-epoched-merged-FiltDur-{}/s{}-{}-Deci-Filter-Trim-ICA-Pruned-Epoched-Merged.set".format(condition, session_id, speaker_id)
 
@@ -57,22 +55,3 @@ def split_dev_test_sets(epoch_ids):
     development_ids = np.concatenate(epoch_ids_partition[0:4])
     validation_ids = epoch_ids_partition[4]
     return development_ids, validation_ids
-
-
-def add_events(session_id, speaker_id, conditions, condition, set_files_folder, verbose=True):
-    event_id = dict([("{}/{}".format(cond.split("_")[0], cond.split("_")[1]), conditions.index(cond)) for cond in conditions])
-
-    set_filename = set_file_for(session_id, speaker_id, condition, set_files_folder)
-
-    mne_data = mne.io.read_epochs_eeglab(set_filename)
-
-    frame = mne_data.time_as_index(0)  # Frame at 0 secs
-    nepochs = mne_data._get_data().shape[0]
-    events = np.array([(frame[0], 0, conditions.index(condition))] * nepochs)
-    mne_data.event_id = event_id
-    mne_data.events = events
-
-    if verbose:
-        print("s{}-{}: {}".format(session_id, speaker_id, condition))
-
-    return mne_data

@@ -1,6 +1,6 @@
 import system
-from .interval import Interval
-from .wavesurfer import WaveSurfer
+from . import interval
+from . import wavesurfer
 
 
 class ParseError(Exception):
@@ -17,19 +17,19 @@ class WaveParser:
         values = [x.split() for x in self.lines]
 
         def as_interval(y):
-            return Interval(y[0], y[1], y[2])
+            return interval.Interval(y[0], y[1], y[2])
 
         intervals = []
         for v in values:
-            interval = as_interval(v)
-            if interval.start != self.lastEnd or interval.end < self.lastEnd:
+            i = as_interval(v)
+            if i.start != self.lastEnd or i.end < self.lastEnd:
                 raise ParseError("Malformed Wavesurfer, check for missing time values")
             else:
-                self.lastEnd = interval.end
+                self.lastEnd = i.end
 
             intervals.append(interval)
 
-        return WaveSurfer(intervals)
+        return wavesurfer.WaveSurfer(intervals)
 
 
 def read(wavesurfer_file):

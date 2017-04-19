@@ -1,4 +1,4 @@
-from .interval import Interval
+from . import interval
 import system
 
 
@@ -22,13 +22,13 @@ class WaveSurfer():
         if len(self.intervals) != len(x.intervals):
             system.warning("number of intervals: {} vs {}".format(len(self.intervals), len(x.intervals)))
 
-        for interval in x:
-            if interval.start != self.current().start:
-                system.error("different starts on interval ({}) {} vs {}".format(self.counter + 1, interval.start, self.current().start))
+        for i in x:
+            if i.start != self.current().start:
+                system.error("different starts on interval ({}) {} vs {}".format(self.counter + 1, i.start, self.current().start))
                 raise Exception("Intervals are not the same")
 
-            if interval.value != self.current().value:
-                differences.append((self.counter + 1, interval.start, interval.end))
+            if i.value != self.current().value:
+                differences.append((self.counter + 1, i.start, i.end))
             next(self)
 
         return differences
@@ -79,12 +79,12 @@ class WaveSurfer():
                 if current_ipu:
                     vad_intervals.append(current_ipu)
                     current_ipu = None
-                vad_intervals.append(Interval(i.start, i.end, "0"))
+                vad_intervals.append(interval.Interval(i.start, i.end, "0"))
 
             else:
                 if not current_ipu:
-                    current_ipu = Interval(i.start, i.end, "1")
+                    current_ipu = interval.Interval(i.start, i.end, "1")
                 else:
-                    current_ipu = Interval(current_ipu.start, i.end, "1")
+                    current_ipu = interval.Interval(current_ipu.start, i.end, "1")
 
         return WaveSurfer(vad_intervals)
