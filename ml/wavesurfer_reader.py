@@ -1,4 +1,6 @@
-import system
+# coding=utf-8
+
+from . import system
 from . import interval
 from . import wavesurfer
 

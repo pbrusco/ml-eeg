@@ -1,3 +1,5 @@
+# coding=utf-8
+
 import system
 from . import interval
 from . import wavesurfer

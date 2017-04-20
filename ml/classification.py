@@ -1,5 +1,5 @@
-#!/usr/bin/python
 # coding: utf-8
+
 import sklearn.cross_validation
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier

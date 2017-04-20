@@ -1,13 +1,14 @@
-#!/usr/bin/python
 # coding: utf-8
+
 import matplotlib.pyplot as plt
 import math
+
+from . import signal_processing
 
 import matplotlib.patches as patches
 import numpy as np
 from sklearn import metrics
 import seaborn as sns
-import signal_processing
 import mne
 from IPython.display import display
 

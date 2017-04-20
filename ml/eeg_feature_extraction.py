@@ -1,9 +1,12 @@
-import signal_processing
+# coding=utf-8
+
+from . import signal_processing
+from . import feature_extraction
+from . import utils
+
 import numpy as np
 from scipy import signal
 import mne
-from . import feature_extraction
-from . import utils
 
 
 class EEGFeatureExtractor(feature_extraction.FeatureExtractor):

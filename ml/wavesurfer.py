@@ -1,5 +1,7 @@
+# coding=utf-8
+
 from . import interval
-import system
+from . import system
 
 
 class WaveSurfer():

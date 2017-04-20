@@ -1,5 +1,7 @@
+# coding=utf-8
+
 from pydub import AudioSegment
-import system
+from . import system
 
 
 def load_wav(filename):
