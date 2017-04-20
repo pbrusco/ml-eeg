@@ -26,17 +26,12 @@ class AcousticsExtractor(AudioExtractor):
 
     def __init__(self, config):
         self.params = utils.read_config(config)
-
-        self.pitch_config = self.params["pitch_config"]
-        self.intensity_config = self.params["intensity_config"]
         # self.voice_quality_config = self.params["voice_quality_config"]
-        self.temp_folder = "/tmp/opensmile_arffs/"
-        self.extended_features = self.params["extended_features"]
-        self.extract_on_last_seconds = self.params["extract_on_last_seconds"]
+        self.temp_folder = config["temp_folder"] if "temp_folder" in config else "/tmp/opensmile_arffs/"
         system.mkdir_p(self.temp_folder)
 
     def extract(self, instance):
-        last_seconds_values = self.extract_on_last_seconds
+        last_seconds_values = self.params["extract_on_last_seconds"]
 
         duration = instance.audio.duration_seconds
         times_pitch, pitch = self.extract_pitch(instance)
@@ -91,7 +86,7 @@ class AcousticsExtractor(AudioExtractor):
             for feat_name in ["f0_slope", "mean_pitch", "mean_intensity", "mean_jitter", "mean_shimmer", "mean_nhr"]:
                 feat["{}_{}".format(feat_name, in_ms)] = all_values[feat_name][last_secs]
 
-        if self.extended_features:
+        if self.params["extended_features"]:
             feat["pitch"] = pitch
             feat["times_pitch"] = times_pitch
 
@@ -101,7 +96,7 @@ class AcousticsExtractor(AudioExtractor):
         return feat
 
     def extract_pitch(self, instance):
-        data = self.call_opensmile_script(self.pitch_config, instance.filename)
+        data = self.call_opensmile_script(self.params["pitch_config"], instance.filename)
 
         times = self.get_column(data, "frameTime")
         pitch = self.get_column(data, "F0final_sma")
