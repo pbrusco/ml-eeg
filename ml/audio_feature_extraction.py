@@ -1,5 +1,4 @@
 # coding: utf-8
-import feature_extraction
 import collections
 import system
 import arff
@@ -8,6 +7,8 @@ import scipy.stats
 import time
 import os.path
 import inspect
+from . import utils
+from . import feature_extraction
 
 
 class AudioExtractor(feature_extraction.FeatureExtractor):
@@ -23,13 +24,15 @@ class AcousticsExtractor(AudioExtractor):
     # ; Voice Quality (Shimmer)
     # ; Voice Quality (NHR)
 
-    def __init__(self, params):
-        self.pitch_config = params["pitch_config"]
-        self.intensity_config = params["intensity_config"]
-        # self.voice_quality_config = params["voice_quality_config"]
+    def __init__(self, config):
+        self.params = utils.read_config(config)
+
+        self.pitch_config = self.params["pitch_config"]
+        self.intensity_config = self.params["intensity_config"]
+        # self.voice_quality_config = self.params["voice_quality_config"]
         self.temp_folder = "/tmp/opensmile_arffs/"
-        self.extended_features = params["extended_features"]
-        self.extract_on_last_seconds = params["extract_on_last_seconds"]
+        self.extended_features = self.params["extended_features"]
+        self.extract_on_last_seconds = self.params["extract_on_last_seconds"]
         system.mkdir_p(self.temp_folder)
 
     def extract(self, instance):

@@ -2,24 +2,26 @@ import signal_processing
 import numpy as np
 from scipy import signal
 import mne
-import feature_extraction
+from . import feature_extraction
+from . import utils
 
 
 class EEGFeatureExtractor(feature_extraction.FeatureExtractor):
-    def __init__(self, params):
-        self.time_limits = params["time_limits"]
-        self.tmin = params["tmin"]
-        self.freq = float(params["freq"])
-        self.n_channels = int(params["n_channels"])
-        self.channels_to_extract_from = list(params["channels_to_extract_from"])
-        self.verbose = params["verbose"] if ("verbose" in params) else None
+    def __init__(self, config):
+        self.params = utils.read_config(config)
+        self.time_limits = self.params["time_limits"]
+        self.tmin = self.params["tmin"]
+        self.freq = float(self.params["freq"])
+        self.n_channels = int(self.params["n_channels"])
+        self.channels_to_extract_from = list(self.params["channels_to_extract_from"])
+        self.verbose = self.params["verbose"] if ("verbose" in self.params) else None
         if self.verbose:
-            print(params)
+            print(self.params)
 
 
 class RawExtractor(EEGFeatureExtractor):
-    def __init__(self, params):
-        super(RawExtractor, self).__init__(params)
+    def __init__(self, config):
+        super(RawExtractor, self).__init__(config)
 
     def extract(self, trial):
         assert self.n_channels == trial.shape[0], "the number of channels in the extractor configuration doen't match {} vs {}".format(self.n_channels, trial.shape[0])
@@ -32,8 +34,8 @@ class RawExtractor(EEGFeatureExtractor):
 
 
 class TrashExtractor(EEGFeatureExtractor):
-    def __init__(self, params):
-        super(TrashExtractor, self).__init__(params)
+    def __init__(self, config):
+        super(TrashExtractor, self).__init__(config)
 
     def extract(self, trial):
         assert self.n_channels == trial.shape[0], "the number of channels in the extractor configuration doen't match {} vs {}".format(self.n_channels, trial.shape[0])
@@ -48,10 +50,10 @@ class TrashExtractor(EEGFeatureExtractor):
 
 
 class FreqExtractor(EEGFeatureExtractor):
-    def __init__(self, params):
-        super(FreqExtractor, self).__init__(params)
-        self.min_freq = params["min_freq"]
-        self.max_freq = params["max_freq"]
+    def __init__(self, config):
+        super(FreqExtractor, self).__init__(config)
+        self.min_freq = self.params["min_freq"]
+        self.max_freq = self.params["max_freq"]
 
     def extract(self, trial):
         assert self.n_channels == trial.shape[0], "the number of channels in the extractor configuration doen't match {} vs {}".format(self.n_channels, trial.shape[0])
@@ -108,18 +110,18 @@ class FreqExtractor(EEGFeatureExtractor):
 
 
 class WaveletsExtractor(EEGFeatureExtractor):
-    def __init__(self, params):
-        super(WaveletsExtractor, self).__init__(params)
+    def __init__(self, config):
+        super(WaveletsExtractor, self).__init__(config)
 
     def extract(self, trial):
         pass
 
 
 class WindowedExtractor(EEGFeatureExtractor):
-    def __init__(self, params):
-        super(WindowedExtractor, self).__init__(params)
-        self.window_sizes = params["window_sizes"]
-        self.step_in_frames = params["step_in_frames"]
+    def __init__(self, config):
+        super(WindowedExtractor, self).__init__(config)
+        self.window_sizes = self.params["window_sizes"]
+        self.step_in_frames = self.params["step_in_frames"]
 
     def extract(self, trial):
         # Trial shape: (channels x samples)

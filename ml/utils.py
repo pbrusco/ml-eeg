@@ -13,15 +13,20 @@ import csv
 HOME = expanduser("~")
 
 
-def read_config(filename):
-    if not system.exists(filename):
-        raise Exception("missing config: {}".format(filename))
-    config = configparser.SafeConfigParser()
-    config.read([filename])
-    res = collections.defaultdict(str)
-    for k, v in config.items("DEFAULT"):
-        res[k] = eval(v)
-    return res
+def read_config(config_input):
+    if isinstance(config_input, basestring):
+        if not system.exists(config_input):
+            raise Exception("missing config: {}".format(config_input))
+        config = configparser.SafeConfigParser()
+        config.read([config_input])
+        res = collections.defaultdict(str)
+        for k, v in config.items("DEFAULT"):
+            res[k] = eval(v)
+        return res
+    elif isinstance(config_input, dict):
+        return config_input
+    else:
+        raise Exception("config type not allowed (type={})".format(type(config_input)))
 
 
 def read_list(filename):
@@ -35,7 +40,11 @@ def read_list(filename):
     for line in lines:
         if line.strip() != "":
             l = line.replace("~/", HOME + "/")
-            res.append(l.split())
+            chunks = l.split()
+            if len(chunks) > 1:
+                res.append(chunks)
+            else:
+                res.append(chunks[0])
 
     return list(res)
 
