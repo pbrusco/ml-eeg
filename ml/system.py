@@ -91,7 +91,7 @@ def run_script(module, **args):
     else:
         print(('\n (running) \x1b[2;32;40m' + cmd + '\x1b[0m'))
         try:
-            module.main(**args)
+            return module.main(**args)
         except Exception:
             print("Error running {} with args {}".format(module.__name__, args))
             raise

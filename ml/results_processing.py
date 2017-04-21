@@ -1,59 +1,23 @@
 # coding: utf-8
 
-import pickle
-from . import system
 import numpy as np
 from sklearn import metrics
-from pandas import DataFrame
 
 
-def classification_results_for(session_id, subject, results_folder, experiment):
-    filename = results_folder + "/{}_s{}_{}.p".format(experiment, session_id, subject)
-    if system.exists(filename):
-        return pickle.load(open(filename, "rb"))
-    return None
-
-
-def analize(results, experiment, measures):
-    result = results[experiment]
+def analize(results, measures):
     processed_result = {}
     for (measure_name, measure_function) in measures:
-        measure_result, support = results_extractor(result, measure_function, permutation=False)
+        measure_result, support = results_extractor(results, measure_function, is_permutation=False)
         processed_result[measure_name] = measure_result
 
-        permutation_keys = [k for k in list(results.keys()) if k.endswith("_permutation")]
-        if len(permutation_keys) > 1:
-            perm_results = [results_extractor(results[p], measure_function, permutation=True)[0] for p in permutation_keys]
-            # processed_result[measure_name + "_perc_05"] = np.percentile(perm_results, 05)
-            # processed_result[measure_name + "_perc_50"] = np.percentile(perm_results, 50)
-            # processed_result[measure_name + "_perc_95"] = np.percentile(perm_results, 95)
-            processed_result[measure_name + "_p_val"] = len([p for p in perm_results if p >= measure_result]) * 1.0 / (len(perm_results))
+        for perm_id, perm_res in results["permutations"].iteritems():
+            permutation_values = [results_extractor(perm_res, measure_function, is_permutation=True) for perm_id, perm_res in results["permutations"].iteritems()]
+            processed_result[measure_name + "_p_val"] = len([p for p in permutation_values if p >= measure_result]) * 1.0 / (len(permutation_values))
 
     total_support = support
-    processed_result.update({
-                            "experiment": experiment,
-                            "support": total_support,
-                            })
+    processed_result.update(dict(support=total_support))
+
     return processed_result
-
-
-def compare_subjects(sessions, results_folder, measures, experiments, warnings=True):
-    res = []
-    for (session_id, subject) in sessions:
-        try:
-            subject_session = (session_id, subject)
-            for experiment in experiments:
-                results = classification_results_for(session_id, subject, results_folder, experiment)
-                if not results:
-                    print("no results found for", (session_id, subject, results_folder, experiment))
-                    continue
-                row = analize(results, experiment, measures)
-                row.update({"session": subject_session})
-                res.append(row)
-        except:
-            continue
-
-    return DataFrame(res)
 
 
 def auc_fn(actual, predicted_probabilities, categories):
@@ -67,9 +31,9 @@ def accuracy_fn(actual, predicted_probabilities, categories):
     return metrics.accuracy_score(actual, predicted)
 
 
-def results_extractor(results, measure, permutation):
+def results_extractor(results, measure, is_permutation):
     categories = results["categories"]
-    classifier_results = results["results"][list(results["results"].keys())[0]]
+    classifier_results = results["fold_results"]
 
     supports = []
     all_actuals = []
@@ -82,7 +46,7 @@ def results_extractor(results, measure, permutation):
         predicted_probabilities = res_fold_i["predicted_probabilities"]
         all_actuals.extend(actual)
 
-        if not permutation:
+        if not is_permutation:
             all_feature_importances.append(res_fold_i["classifier_weights"])
 
         all_predicted_probabilities.extend(predicted_probabilities)
