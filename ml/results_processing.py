@@ -1,5 +1,6 @@
 # coding: utf-8
 
+from __future__ import division
 import numpy as np
 from sklearn import metrics
 
@@ -11,7 +12,7 @@ def analize(results, measures):
         processed_result[measure_name] = measure_result
 
         for perm_id, perm_res in results["permutations"].iteritems():
-            permutation_values = [results_extractor(perm_res, measure_function, is_permutation=True) for perm_id, perm_res in results["permutations"].iteritems()]
+            permutation_values = [results_extractor(perm_res, measure_function, is_permutation=True)[0] for perm_id, perm_res in results["permutations"].iteritems()]
             processed_result[measure_name + "_p_val"] = len([p for p in permutation_values if p >= measure_result]) * 1.0 / (len(permutation_values))
 
     total_support = support

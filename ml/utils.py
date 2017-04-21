@@ -151,7 +151,6 @@ def apply_mapping_to_data(X, y, categories_mapping):
 
 def compare_intersection(y_1, y_2):
     intersection = sum([1 if y else 0 for y in (y_1 == y_2)])
-    print("permutation intersection: {}%".format(round((100.0 * intersection) / len(y_2), 2)))
     return intersection
 
 
