@@ -108,7 +108,7 @@ class AcousticsExtractor(AudioExtractor):
         return times, pitch
 
     def extract_intensity(self, instance):
-        data = self.call_opensmile_script(self.intensity_config, instance.filename)
+        data = self.call_opensmile_script(self.params["intensity_config"], instance.filename)
 
         times = self.get_column(data, "frameTime")
         intensities = self.get_column(data, "pcm_intensity_sma")
@@ -124,17 +124,15 @@ class AcousticsExtractor(AudioExtractor):
 
         script_path = os.path.dirname(inspect.getfile(inspect.currentframe())) + "/voice-analysis.praat"
         try:
-            script_path = os.path.dirname(inspect.getfile(inspect.currentframe())) + "/voice-analysis-voiced.praat"
             output = system.run_external_command("praat {}".format(script_path), non_named_params=[instance.filename, start, end, min_pitch, max_pitch])
-            values = dict([o.split(":") for o in output.split()])
-            jitter = float(values["sound_voiced_local_jitter"]) if "undefined" not in values["sound_voiced_local_jitter"] else np.nan
-            shimmer = float(values["sound_voiced_local_shimmer"]) if "undefined" not in values["sound_voiced_local_shimmer"] else np.nan
-            nhr = float(values["noise_to_harmonics_ratio"]) if "undefined" not in values["noise_to_harmonics_ratio"] else np.nan
         except:
-            print("No voiced frames on range {}-{}".format(start, end))
-            jitter = np.nan
-            shimmer = np.nan
-            nhr = np.nan
+            return np.nan, np.nan, np.nan
+
+        values = dict([o.split(":") for o in output.split()])
+
+        jitter = float(values["sound_voiced_local_jitter"]) if "undefined" not in values["sound_voiced_local_jitter"] else np.nan
+        shimmer = float(values["sound_voiced_local_shimmer"]) if "undefined" not in values["sound_voiced_local_shimmer"] else np.nan
+        nhr = float(values["noise_to_harmonics_ratio"]) if "undefined" not in values["noise_to_harmonics_ratio"] else np.nan
 
         return jitter, shimmer, nhr
 
