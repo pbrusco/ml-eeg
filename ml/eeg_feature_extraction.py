@@ -35,6 +35,9 @@ class RawExtractor(EEGFeatureExtractor):
         data = trial[self.channels_to_extract_from, initial_frame:end_frame]
         return data
 
+    def feature_names(self):
+        pass
+
 
 class TrashExtractor(EEGFeatureExtractor):
     def __init__(self, config):
@@ -50,6 +53,9 @@ class TrashExtractor(EEGFeatureExtractor):
 
         data = np.random.random(data.shape[0])
         return data
+
+    def feature_names(self):
+        pass
 
 
 class FreqExtractor(EEGFeatureExtractor):
@@ -111,6 +117,9 @@ class FreqExtractor(EEGFeatureExtractor):
 
         return res
 
+    def feature_names(self):
+        return [c["name"] for c in self.mapping().values()]
+
 
 class WaveletsExtractor(EEGFeatureExtractor):
     def __init__(self, config):
@@ -154,7 +163,7 @@ class WindowedExtractor(EEGFeatureExtractor):
     def mapping(self):
         i = 0
         dummy_epoch = np.zeros((self.n_channels, 1075))  # (channels x samples)
-        montage = mne.channels.read_montage('/home/pbrusco/projects/montages/LNI.sfp')
+        montage = mne.channels.read_montage(self.params["montage"])
 
         res = {}
         for window_size_in_secs in self.window_sizes:
@@ -180,3 +189,6 @@ class WindowedExtractor(EEGFeatureExtractor):
                     )
                     i = i + 1
         return res
+
+    def feature_names(self):
+        return [c["name"] for c in self.mapping().values()]

@@ -39,16 +39,12 @@ def results_extractor(results, measure, is_permutation):
     supports = []
     all_actuals = []
     all_predicted_probabilities = []
-    all_feature_importances = []
 
     for i in list(classifier_results.keys()):
         res_fold_i = classifier_results[i]
         actual = res_fold_i["actual"]
         predicted_probabilities = res_fold_i["predicted_probabilities"]
         all_actuals.extend(actual)
-
-        if not is_permutation:
-            all_feature_importances.append(res_fold_i["classifier_weights"])
 
         all_predicted_probabilities.extend(predicted_probabilities)
         supports.append([sum(actual == c) for c in categories])
@@ -60,12 +56,11 @@ def results_extractor(results, measure, is_permutation):
 
 
 def feature_importances(results):
-    classifier_results = results["results"][list(results["results"].keys())[0]]
+    results = results["fold_results"]
     all_feature_importances = []
 
-    for i in list(classifier_results.keys()):
-        res_fold_i = classifier_results[i]
-        all_feature_importances.append(res_fold_i["classifier_weights"])
+    for fold, fold_results in results.iteritems():
+        all_feature_importances.append(fold_results["classifier_weights"])
 
     feature_importances_by_folds = np.array(all_feature_importances)
     return feature_importances_by_folds.mean(axis=0), feature_importances_by_folds.std(axis=0)

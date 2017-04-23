@@ -10,3 +10,6 @@ class FeatureExtractor(object):
 
     def batch_extract(self, instances_list):
         raise NotImplementedError("{} must implement the 'extract_batch' method".format(self))
+
+    def feature_names(self):
+        raise NotImplementedError("{} must implement the 'feature_names' method".format(self))
