@@ -245,6 +245,8 @@ def feature_importances_bars(features_table, title=""):
     #
     # f = gr.get_figure()
     # f.tight_layout()
+    plt.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))
+
     for idx, row in features_table.iterrows():
         alpha = row.window_size / features_table.window_size.max()
         plt.hlines(y=row.feature_importances_folds_mean, lw=5, alpha=alpha, xmin=row.starting_time, xmax=row.end_time)
