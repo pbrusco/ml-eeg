@@ -6,20 +6,35 @@ from sklearn import metrics
 from . import utils
 
 
-def analize(results, measures):
+def calculate_measures(results, measures):
     processed_result = {}
+    supports = []
     for (measure_name, measure_function) in measures:
-        measure_result, support = results_extractor(results, measure_function, is_permutation=False)
+
+        measure_result, pvalue, support = apply_measure(results, measure_function)
         processed_result[measure_name] = measure_result
+        processed_result[measure_name + "_p_val"] = pvalue
+        supports.append(support)
 
-        for perm_id, perm_res in results["permutations"].iteritems():
-            permutation_values = [results_extractor(perm_res, measure_function, is_permutation=True)[0] for perm_id, perm_res in results["permutations"].iteritems()]
-            processed_result[measure_name + "_p_val"] = len([p for p in permutation_values if p >= measure_result]) * 1.0 / (len(permutation_values))
+    assert(utils.all_equal(supports))
 
-    total_support = support
-    processed_result.update(dict(support=total_support))
+    support = supports[0]
+    processed_result.update(dict(support=support))
 
     return processed_result
+
+
+def apply_measure(results, measure_function):
+    measure_result, support = results_extractor(results, measure_function, is_permutation=False)
+
+    permutation_values = [results_extractor(perm_res, measure_function, is_permutation=True)[0] for perm_id, perm_res in results["permutations"].iteritems()]
+
+    if len(permutation_values) == 0:
+        pvalue = np.nan
+    else:
+        pvalue = len([p for p in permutation_values if p >= measure_result]) * 1.0 / (len(permutation_values))
+
+    return measure_result, pvalue, support
 
 
 def auc_fn(actual, predicted_probabilities, categories):
@@ -52,12 +67,11 @@ def results_extractor(results, measure, is_permutation):
     return measure_result, list(zip(categories, support))
 
 
-def feature_importances(results):
-    results = results["fold_results"]
+def feature_importances(fold_results):
     all_feature_importances = []
 
-    for fold, fold_results in results.iteritems():
-        all_feature_importances.append(fold_results["classifier_weights"])
+    for fold, fold_result in fold_results.iteritems():
+        all_feature_importances.append(fold_result["classifier_weights"])
 
     feature_importances_by_folds = np.array(all_feature_importances)
     return feature_importances_by_folds.mean(axis=0), feature_importances_by_folds.std(axis=0)

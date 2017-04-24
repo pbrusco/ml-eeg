@@ -176,3 +176,8 @@ def unzip(arr):
 
 def flatten(list_of_lists):
     return [e for l in list_of_lists for e in l]
+
+
+def all_equal(l):
+    l = np.array(l)
+    return l.size == 0 or np.all(l == l[0])
