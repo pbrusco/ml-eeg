@@ -13,24 +13,11 @@ import mne
 from IPython.display import display
 
 
-def plot_roc_curve(exp_results, roc_title, folds, classifier, ax, permutation, fontsize=30):
-    classifier_results = exp_results["results"][classifier]
-    all_actuals = []
-    all_probs = []
-
-    for i in list(classifier_results.keys()):
-        actual = exp_results["results"][classifier][i]["actual"]
-        predicted_probabilities = exp_results["results"][classifier][i]["predicted_probabilities"]
-
-        # Compute ROC curve and area the curve
-        probs = predicted_probabilities[:, 1]
-        all_actuals.extend(actual)
-        all_probs.extend(probs)
-
-    fpr, tpr, thresholds = metrics.roc_curve(all_actuals, all_probs)
+def plot_roc_curve(y_actual, y_scores, roc_title, ax, is_permutation, fontsize=30):
+    fpr, tpr, thresholds = metrics.roc_curve(y_actual, y_scores)
     roc_auc = metrics.auc(fpr, tpr)
 
-    if permutation:
+    if is_permutation:
         ax.plot(fpr, tpr, "b-", alpha=0.5, lw=0.3)
     else:
         ax.plot([0, 1], [0, 1], '--', lw=6, color="k", label='Chance')

@@ -3,6 +3,7 @@
 from __future__ import division
 import numpy as np
 from sklearn import metrics
+from . import utils
 
 
 def analize(results, measures):
@@ -22,35 +23,31 @@ def analize(results, measures):
 
 
 def auc_fn(actual, predicted_probabilities, categories):
-    predicted_proba = [p[1] for p in predicted_probabilities]
-    return metrics.roc_auc_score(actual, predicted_proba)
+    return metrics.roc_auc_score(actual, predicted_probabilities)
 
 
 def accuracy_fn(actual, predicted_probabilities, categories):
-    predicted_proba = [p[1] for p in predicted_probabilities]
-    predicted = [1 if p > 0.5 else 0 for p in predicted_proba]
+    predicted = [1 if p > 0.5 else 0 for p in predicted_probabilities]
     return metrics.accuracy_score(actual, predicted)
+
+
+def y_true_from_fold_result(fold_results):
+    return np.array(utils.flatten([fold_res["actual"] for k, fold_res in fold_results.iteritems()]))
+
+
+def y_score_from_fold_result(fold_results):
+    return np.array(utils.flatten([fold_res["predicted_probabilities"][:, 1] for k, fold_res in fold_results.iteritems()]))
 
 
 def results_extractor(results, measure, is_permutation):
     categories = results["categories"]
-    classifier_results = results["fold_results"]
+    fold_results = results["fold_results"]
 
-    supports = []
-    all_actuals = []
-    all_predicted_probabilities = []
+    actual = y_true_from_fold_result(fold_results)
+    predicted_probabilities = y_score_from_fold_result(fold_results)
 
-    for i in list(classifier_results.keys()):
-        res_fold_i = classifier_results[i]
-        actual = res_fold_i["actual"]
-        predicted_probabilities = res_fold_i["predicted_probabilities"]
-        all_actuals.extend(actual)
-
-        all_predicted_probabilities.extend(predicted_probabilities)
-        supports.append([sum(actual == c) for c in categories])
-
-    measure_result = measure(all_actuals, all_predicted_probabilities, categories)
-    support = np.sum(supports, axis=0)
+    measure_result = measure(actual, predicted_probabilities, categories)
+    support = [sum(actual == c) for c in categories]
 
     return measure_result, list(zip(categories, support))
 
