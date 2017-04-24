@@ -230,19 +230,25 @@ def feature_importances_topomap(features_table, features_config, cmap="Greys", f
 
 def feature_importances_bars(features_table, title=""):
     plt.figure()
-    gr = sns.pointplot(x="starting_time", y="feature_importances_folds_mean",
-                       data=features_table, hue="window_size", palette="Set1", markers=["D", "s", "o", ">"],
-                       ci=68, scale=1, linestyles=["--"] * 4)
+    # gr = sns.pointplot(x="starting_time", y="feature_importances_folds_mean",
+    #                    data=features_table, hue="window_size", palette="Set1", markers=["D", "s", "o", ">"],
+    #                    ci=68, scale=1, linestyles=["--"] * 4)
+    #
+    # gr.legend(title="window size", loc='upper center')
+    # ticks = gr.get_xticklabels()
+    #
+    # gr.set_xticklabels(ticks, rotation=90)
+    # gr.set_ylabel("mean(feature importance)")
+    # # gr.set_yticks([])
+    # gr.set_xlabel("window starting time (ms)")
+    # gr.set_title(title)
+    #
+    # f = gr.get_figure()
+    # f.tight_layout()
+    for idx, row in features_table.iterrows():
+        alpha = row.window_size / features_table.window_size.max()
+        plt.hlines(y=row.feature_importances_folds_mean, lw=5, alpha=alpha, xmin=row.starting_time, xmax=row.end_time)
 
-    gr.legend(title="window size", loc='upper center')
-    ticks = gr.get_xticklabels()
-
-    gr.set_xticklabels(ticks, rotation=90)
-    gr.set_ylabel("mean(feature importance)")
-    # gr.set_yticks([])
-    gr.set_xlabel("window starting time (ms)")
-    gr.set_title(title)
-
-    f = gr.get_figure()
-    f.tight_layout()
+    plt.ylim([features_table.feature_importances_folds_mean.min(), features_table.feature_importances_folds_mean.max()])
+    plt.xlim([features_table.starting_time.min(), features_table.end_time.max()])
     plt.show()
