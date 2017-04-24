@@ -19,7 +19,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='ml-eeg',
-    version='0.0.30',
+    version='0.0.31',
     
     description='A ml & eeg helper library',
     long_description=long_description,

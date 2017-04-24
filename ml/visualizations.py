@@ -13,7 +13,7 @@ import mne
 from IPython.display import display
 
 
-def plot_roc_curve(y_actual, y_scores, roc_title, ax, is_permutation, fontsize=30):
+def plot_roc_curve(y_actual, y_scores, ax, is_permutation, fontsize=30):
     fpr, tpr, thresholds = metrics.roc_curve(y_actual, y_scores)
     roc_auc = metrics.auc(fpr, tpr)
 
@@ -200,33 +200,35 @@ def feature_importances_by_window_size(features_table, title):
     return gr.get_figure()
 
 
-def feature_importances_topomap(features_table, features_config):
+def feature_importances_topomap(features_table, features_config, cmap="Greys", fontsize=15, title=""):
     montage = mne.channels.read_montage(features_config["montage"])
 
     vmin = features_table.feature_importances_folds_mean.min()
     vmax = features_table.feature_importances_folds_mean.max()
     l = mne.channels.make_eeg_layout(mne.create_info(montage.ch_names, features_config["freq"], ch_types="eeg", montage=montage))
-    for (cmap, window_size, (rows, cols)) in zip(["BuGn", "Oranges", "Blues", "Purples"], features_config["window_sizes"], [(4, 4), (3, 4), (4, 2), (1, 3)]):
-        starting_samples = sorted(set(features_table[features_table["window_size"] == window_size].starting_sample))
-        fig, axes = plt.subplots(rows, cols)  # , figsize=(15, 15)
 
-        axes = axes.flatten()
-        [ax.axis('off') for ax in axes]
-        for sample, ax in zip(starting_samples, axes):
-            sample_data = features_table[(features_table["starting_sample"] == sample) & (features_table["window_size"] == window_size)]
+    starting_samples = sorted(set(features_table.starting_sample))
+    fig, axes = plt.subplots(1, len(starting_samples), figsize=(3 * len(starting_samples), 5))
 
-            t = int(float(list(sample_data.starting_time)[0]) * 100) * 10
+    if not isinstance(axes, np.ndarray):
+        axes = np.array([axes])
 
-            values = np.array(sample_data.groupby("channel")["feature_importances_folds_mean"].mean())
-            # mne.viz.plot_topomap(values, l.pos[:, 0:2], axes=ax, show_names=True, names=montage.ch_names, outlines="skirt", show=False)
-            mne.viz.plot_topomap(values, l.pos[:, 0:2], vmin=vmin, vmax=vmax, axes=ax, show_names=False, names=montage.ch_names, show=False, cmap=cmap, )
-            # plt.subplots_adjust(left=0.01, right=0.99, bottom=0.01, top=0.88)
-            ax.set_title("{} ms".format(t), fontsize=35)
-        fig.tight_layout()
-        plt.show()
+    [ax.axis('off') for ax in axes]
+    for sample, ax in zip(starting_samples, axes):
+        sample_data = features_table[features_table["starting_sample"] == sample]
+
+        t = list(sample_data.starting_time)[0]
+
+        values = np.array(sample_data.groupby("channel")["feature_importances_folds_mean"].mean())
+        mne.viz.plot_topomap(values, l.pos[:, 0:2], outlines="skirt", vmin=vmin, vmax=vmax, axes=ax, show_names=False, names=montage.ch_names, show=False, cmap=cmap)
+        ax.set_title("{} ms".format(t), fontsize=fontsize)
+
+    fig.suptitle(title, fontsize=16)
+
+    plt.show()
 
 
-def feature_importances_bars(features_table, experiment):
+def feature_importances_bars(features_table, title=""):
     plt.figure()
     gr = sns.pointplot(x="starting_time", y="feature_importances_folds_mean",
                        data=features_table, hue="window_size", palette="Set1", markers=["D", "s", "o", ">"],
@@ -237,9 +239,9 @@ def feature_importances_bars(features_table, experiment):
 
     gr.set_xticklabels(ticks, rotation=90)
     gr.set_ylabel("mean(feature importance)")
-    gr.set_yticks([])
+    # gr.set_yticks([])
     gr.set_xlabel("window starting time (ms)")
-    gr.set_title("Importance of Features over Time ({})".format(experiment))
+    gr.set_title(title)
 
     f = gr.get_figure()
     f.tight_layout()
