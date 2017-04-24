@@ -191,30 +191,30 @@ def barplot(session, data, measure):
     plt.tight_layout()
 
 
-def feature_importances_by_window_size(df, title):
+def feature_importances_by_window_size(features_table, title):
     # https://gist.github.com/wmvanvliet/6d7c78ea329d4e9e1217
-    gr = sns.stripplot(x="starting_time", y="feature_importances_folds_mean", data=df, hue="window_size", palette="Set2")
+    gr = sns.stripplot(x="starting_time", y="feature_importances_folds_mean", data=features_table, hue="window_size", palette="Set2")
     gr.set_xticklabels(gr.get_xticklabels(), rotation=90)
     gr.set_title(title)
     plt.show()
     return gr.get_figure()
 
 
-def feature_importances_topomap(df, window_sizes, freq):
-    montage = mne.channels.read_montage('/home/pbrusco/projects/montages/LNI.sfp')
+def feature_importances_topomap(features_table, features_config):
+    montage = mne.channels.read_montage(features_config["montage"])
 
-    vmin = df.feature_importances_folds_mean.min()
-    vmax = df.feature_importances_folds_mean.max()
-    l = mne.channels.make_eeg_layout(mne.create_info(montage.ch_names, freq, ch_types="eeg", montage=montage))
-    for (cmap, window_size, (rows, cols)) in zip(["BuGn", "Oranges", "Blues", "Purples"], window_sizes, [(4, 4)]):  # , (3, 4), (4, 2), (1, 3)
-        display(window_size)
-        starting_samples = sorted(set(df[df["window_size"] == window_size].starting_sample))
-        fig, axes = plt.subplots(rows, cols, figsize=(15, 15))
-        # fig.subplots_adjust(hspace=.5)
+    vmin = features_table.feature_importances_folds_mean.min()
+    vmax = features_table.feature_importances_folds_mean.max()
+    l = mne.channels.make_eeg_layout(mne.create_info(montage.ch_names, features_config["freq"], ch_types="eeg", montage=montage))
+    for (cmap, window_size, (rows, cols)) in zip(["BuGn", "Oranges", "Blues", "Purples"], features_config["window_sizes"], [(4, 4), (3, 4), (4, 2), (1, 3)]):
+        starting_samples = sorted(set(features_table[features_table["window_size"] == window_size].starting_sample))
+        fig, axes = plt.subplots(rows, cols)  # , figsize=(15, 15)
+
         axes = axes.flatten()
         [ax.axis('off') for ax in axes]
         for sample, ax in zip(starting_samples, axes):
-            sample_data = df[(df["starting_sample"] == sample) & (df["window_size"] == window_size)]
+            sample_data = features_table[(features_table["starting_sample"] == sample) & (features_table["window_size"] == window_size)]
+
             t = int(float(list(sample_data.starting_time)[0]) * 100) * 10
 
             values = np.array(sample_data.groupby("channel")["feature_importances_folds_mean"].mean())
@@ -223,4 +223,24 @@ def feature_importances_topomap(df, window_sizes, freq):
             # plt.subplots_adjust(left=0.01, right=0.99, bottom=0.01, top=0.88)
             ax.set_title("{} ms".format(t), fontsize=35)
         fig.tight_layout()
-        return fig
+        plt.show()
+
+
+def feature_importances_bars(features_table, experiment):
+    plt.figure()
+    gr = sns.pointplot(x="starting_time", y="feature_importances_folds_mean",
+                       data=features_table, hue="window_size", palette="Set1", markers=["D", "s", "o", ">"],
+                       ci=68, scale=1, linestyles=["--"] * 4)
+
+    gr.legend(title="window size", loc='upper center')
+    ticks = gr.get_xticklabels()
+
+    gr.set_xticklabels(ticks, rotation=90)
+    gr.set_ylabel("mean(feature importance)")
+    gr.set_yticks([])
+    gr.set_xlabel("window starting time (ms)")
+    gr.set_title("Importance of Features over Time ({})".format(experiment))
+
+    f = gr.get_figure()
+    f.tight_layout()
+    plt.show()

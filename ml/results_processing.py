@@ -4,6 +4,7 @@ from __future__ import division
 import numpy as np
 from sklearn import metrics
 from . import utils
+import pandas
 
 
 def calculate_measures(results, measures):
@@ -75,3 +76,19 @@ def feature_importances(fold_results):
 
     feature_importances_by_folds = np.array(all_feature_importances)
     return feature_importances_by_folds.mean(axis=0), feature_importances_by_folds.std(axis=0)
+
+
+def feature_importances_table(fold_results, feature_mapping, session_id, subject):
+    importance_means, importance_stds = feature_importances(fold_results)
+    importances_res = []
+
+    for feature_id, (importance_mean, importance_std) in enumerate(zip(importance_means, importance_stds)):
+        info = feature_mapping[feature_id].copy()
+        info["feature_importances_folds_mean"] = importance_mean
+        info["feature_importances_folds_std"] = importance_std
+        info["session"] = session_id
+        info["subject"] = subject
+        importances_res.append(info)
+
+    features_table = pandas.DataFrame(importances_res)
+    return features_table
