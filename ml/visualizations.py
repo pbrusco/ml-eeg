@@ -196,36 +196,37 @@ def feature_importances_by_window_size(features_table, title):
     gr = sns.stripplot(x="starting_time", y="feature_importances_folds_mean", data=features_table, hue="window_size", palette="Set2")
     gr.set_xticklabels(gr.get_xticklabels(), rotation=90)
     gr.set_title(title)
-    plt.show()
+    plt.draw()
     return gr.get_figure()
 
 
 def feature_importances_topomap(features_table, features_config, cmap="Greys", fontsize=15, title=""):
     montage = mne.channels.read_montage(features_config["montage"])
 
-    vmin = features_table.feature_importances_folds_mean.min()
-    vmax = features_table.feature_importances_folds_mean.max()
+    # vmin = features_table.feature_importances_folds_mean.min()
+    # vmax = features_table.feature_importances_folds_mean.max()
+    vmin, vmax = (0.0005, 0.0015)
     l = mne.channels.make_eeg_layout(mne.create_info(montage.ch_names, features_config["freq"], ch_types="eeg", montage=montage))
 
-    starting_samples = sorted(set(features_table.starting_sample))
-    fig, axes = plt.subplots(1, len(starting_samples), figsize=(3 * len(starting_samples), 5))
+    times = sorted(set(features_table.time))
+    fig, axes = plt.subplots(1, len(times), figsize=(3 * len(times), 5))
 
     if not isinstance(axes, np.ndarray):
         axes = np.array([axes])
 
     [ax.axis('off') for ax in axes]
-    for sample, ax in zip(starting_samples, axes):
-        sample_data = features_table[features_table["starting_sample"] == sample]
+    for time, ax in zip(times, axes):
+        time_data = features_table[features_table["time"] == time]
 
-        t = list(sample_data.starting_time)[0]
+        t = list(time_data.time)[0]
 
-        values = np.array(sample_data.groupby("channel")["feature_importances_folds_mean"].mean())
+        values = np.array(time_data.groupby("channel")["feature_importances_folds_mean"].mean())
         mne.viz.plot_topomap(values, l.pos[:, 0:2], outlines="skirt", vmin=vmin, vmax=vmax, axes=ax, show_names=False, names=montage.ch_names, show=False, cmap=cmap)
         ax.set_title("{} ms".format(t), fontsize=fontsize)
 
     fig.suptitle(title, fontsize=16)
 
-    plt.show()
+    plt.draw()
 
 
 def feature_importances_bars(features_table, title=""):
@@ -253,4 +254,4 @@ def feature_importances_bars(features_table, title=""):
 
     plt.ylim([features_table.feature_importances_folds_mean.min(), features_table.feature_importances_folds_mean.max()])
     plt.xlim([features_table.starting_time.min(), features_table.end_time.max()])
-    plt.show()
+    plt.draw()
