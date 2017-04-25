@@ -69,6 +69,7 @@ class ClassificationHelper(object):
 
             fold_results[i] = self._classify(X_train, X_test, y_train, save_weights)
             fold_results[i]["actual"] = y_test
+            fold_results[i]["y_ids"] = test_index
 
         return {"categories": self.classes, "fold_results": fold_results, "y": y}
 

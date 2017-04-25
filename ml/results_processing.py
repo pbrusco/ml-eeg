@@ -26,9 +26,8 @@ def calculate_measures(results, measures):
 
 
 def apply_measure(results, measure_function):
-    measure_result, support = results_extractor(results, measure_function, is_permutation=False)
-
-    permutation_values = [results_extractor(perm_res, measure_function, is_permutation=True)[0] for perm_id, perm_res in results["permutations"].iteritems()]
+    measure_result, support = calculate_result_for_measure(results, measure_function)
+    permutation_values = [calculate_result_for_measure(perm_res, measure_function)[0] for perm_id, perm_res in results["permutations"].iteritems()]
 
     if len(permutation_values) == 0:
         pvalue = np.nan
@@ -47,6 +46,10 @@ def accuracy_fn(actual, predicted_probabilities, categories):
     return metrics.accuracy_score(actual, predicted)
 
 
+def y_indices_from_fold_result(fold_results):
+    return np.array(utils.flatten([fold_res["y_ids"] for k, fold_res in fold_results.iteritems()]))
+
+
 def y_true_from_fold_result(fold_results):
     return np.array(utils.flatten([fold_res["actual"] for k, fold_res in fold_results.iteritems()]))
 
@@ -55,7 +58,7 @@ def y_score_from_fold_result(fold_results):
     return np.array(utils.flatten([fold_res["predicted_probabilities"][:, 1] for k, fold_res in fold_results.iteritems()]))
 
 
-def results_extractor(results, measure, is_permutation):
+def calculate_result_for_measure(results, measure):
     categories = results["categories"]
     fold_results = results["fold_results"]
 
