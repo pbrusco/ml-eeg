@@ -1,16 +1,21 @@
 # coding: utf-8
-
-import matplotlib.pyplot as plt
-import math
+from __future__ import division
 
 from . import signal_processing
 
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-import numpy as np
-from sklearn import metrics
+import matplotlib
 import seaborn as sns
-import mne
+
 from IPython.display import display
+import math
+
+
+from sklearn import metrics
+import numpy as np
+import mne
 
 
 def plot_roc_curve(y_actual, y_scores, ax, is_permutation, fontsize=30):
@@ -200,52 +205,40 @@ def feature_importances_by_window_size(features_table, title):
     return gr.get_figure()
 
 
-def feature_importances_topomap(features_table, features_config, cmap="Greys", fontsize=15, title=""):
-    montage = mne.channels.read_montage(features_config["montage"])
+def topomap(values_by_time, montage_file, freq, cmap="Greys", fontsize=15, title=""):
+    montage = mne.channels.read_montage(montage_file)
 
-    # vmin = features_table.feature_importances_folds_mean.min()
-    # vmax = features_table.feature_importances_folds_mean.max()
-    vmin, vmax = (0.0005, 0.0015)
-    l = mne.channels.make_eeg_layout(mne.create_info(montage.ch_names, features_config["freq"], ch_types="eeg", montage=montage))
+    vmin = values_by_time.feature_importances_folds_mean.min()
+    vmax = values_by_time.feature_importances_folds_mean.max()
+    # vmin, vmax = (0.0005, 0.0015)
+    l = mne.channels.make_eeg_layout(mne.create_info(montage.ch_names, freq, ch_types="eeg", montage=montage))
 
-    times = sorted(set(features_table.time))
-    fig, axes = plt.subplots(1, len(times), figsize=(3 * len(times), 5))
+    times = sorted(set(values_by_time.time))
+    fig, axes = plt.subplots(1, len(times), figsize=(3 / 2 * len(times), 5 / 2))
 
     if not isinstance(axes, np.ndarray):
         axes = np.array([axes])
 
     [ax.axis('off') for ax in axes]
-    for time, ax in zip(times, axes):
-        time_data = features_table[features_table["time"] == time]
+    for top_n, (time, ax) in enumerate(zip(times, axes)):
+        time_data = values_by_time[values_by_time["time"] == time]
 
         t = list(time_data.time)[0]
+        image, _ = mne.viz.plot_topomap(list(time_data["values"]), l.pos[:, 0:2], vmin=vmin, vmax=vmax, outlines="skirt", axes=ax, show_names=False, names=montage.ch_names, show=False, cmap=cmap)
+        if top_n == len(axes) - 1:
+            divider = make_axes_locatable(ax)
+            ax_colorbar = divider.append_axes('right', size='5%', pad=0.05)
+            plt.colorbar(image, cax=ax_colorbar)
 
-        values = np.array(time_data.groupby("channel")["feature_importances_folds_mean"].mean())
-        mne.viz.plot_topomap(values, l.pos[:, 0:2], outlines="skirt", vmin=vmin, vmax=vmax, axes=ax, show_names=False, names=montage.ch_names, show=False, cmap=cmap)
         ax.set_title("{} ms".format(t), fontsize=fontsize)
 
     fig.suptitle(title, fontsize=16)
-
     plt.draw()
 
 
-def feature_importances_bars(features_table, title=""):
+def lines(features_table, title=""):
     plt.figure()
-    # gr = sns.pointplot(x="starting_time", y="feature_importances_folds_mean",
-    #                    data=features_table, hue="window_size", palette="Set1", markers=["D", "s", "o", ">"],
-    #                    ci=68, scale=1, linestyles=["--"] * 4)
-    #
-    # gr.legend(title="window size", loc='upper center')
-    # ticks = gr.get_xticklabels()
-    #
-    # gr.set_xticklabels(ticks, rotation=90)
-    # gr.set_ylabel("mean(feature importance)")
-    # # gr.set_yticks([])
-    # gr.set_xlabel("window starting time (ms)")
-    # gr.set_title(title)
-    #
-    # f = gr.get_figure()
-    # f.tight_layout()
+
     plt.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))
 
     for idx, row in features_table.iterrows():
@@ -254,4 +247,40 @@ def feature_importances_bars(features_table, title=""):
 
     plt.ylim([features_table.feature_importances_folds_mean.min(), features_table.feature_importances_folds_mean.max()])
     plt.xlim([features_table.starting_time.min(), features_table.end_time.max()])
+    plt.draw()
+
+
+def window_bars(features_table, title="", fontsize=20):
+    features_table.sort_values(["window_size", "starting_time"], ascending=False, inplace=True)
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    cmap = matplotlib.cm.get_cmap('Greys')
+    plt.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))
+    vmin, vmax = (features_table.feature_importances_folds_mean.min(), features_table.feature_importances_folds_mean.max())
+    norm = matplotlib.colors.Normalize(vmin=vmin, vmax=vmax)
+
+    for idx, (_, row) in enumerate(features_table.iterrows()):
+        val = row.feature_importances_folds_mean
+        # plt.hlines(y=idx, lw=3, color=cmap(norm(val)), xmin=row.starting_time, xmax=row.end_time)
+        p = patches.Rectangle(
+            (row.starting_time, idx),  # (x, y)
+            row.window_size,  # width
+            1,  # height
+            facecolor=cmap(norm(val)),
+            # edgecolor="blue"
+        )
+        ax.add_patch(p)
+
+    ax.set_title(title, fontsize=fontsize)
+    plt.xlim([features_table.starting_time.min(), features_table.end_time.max()])
+    plt.ylim([-1, len(features_table) + 2])
+
+    divider = make_axes_locatable(ax)
+    ax_colorbar = divider.append_axes('right', size='60%', pad=0.01)
+
+    img = plt.imshow(np.array([[vmin, vmax]]), cmap=cmap)
+    img.set_visible(False)
+    plt.colorbar(img, cax=ax_colorbar, orientation="vertical")
+
     plt.draw()
