@@ -9,6 +9,7 @@ import collections
 from os.path import expanduser
 from . import system
 import csv
+import random
 
 HOME = expanduser("~")
 
@@ -141,12 +142,14 @@ def count_if(f, values):
     return len([0 for v in values if f(v)])
 
 
-def apply_mapping_to_data(X, y, categories_mapping):
+def apply_mapping_to_data(X, y, ids, categories_mapping):
     mapped_y = np.array([categories_mapping[y_i] for y_i in y])
+
     X_filtered = X[mapped_y != np.array(None), :]
+    ids_filtered = ids[mapped_y != np.array(None)]
     y_filtered = mapped_y[mapped_y != np.array(None)].astype(int)
 
-    return X_filtered, y_filtered
+    return X_filtered, y_filtered, ids_filtered
 
 
 def compare_intersection(y_1, y_2):
@@ -154,19 +157,22 @@ def compare_intersection(y_1, y_2):
     return intersection
 
 
-def subsample_ids(y):
-    counts = collections.Counter(y)
-    ids = []
+def subsample_ids(labels, shuffle=True):
+    assert(isinstance(labels, np.ndarray))
+
+    counts = collections.Counter(labels)
     min_count = min(counts.values())
 
-    counts = dict([(label, 0) for label in list(counts.keys())])
-    for idx, label in enumerate(y):
-        if counts[label] >= min_count:
-            continue
-        else:
-            ids.append(idx)
-            counts[label] += 1
-    return ids
+    res = []
+
+    for classs in counts:
+        indices = np.arange(len(labels))[labels == classs]
+        if shuffle:
+            random.shuffle(indices)
+        res.extend(indices[:min_count])
+
+    res = np.array(res)
+    return res
 
 
 def unzip(arr):

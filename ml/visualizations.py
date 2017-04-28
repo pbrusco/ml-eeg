@@ -89,23 +89,25 @@ def _bar_color(val, color):
         return attrs.format(c=c, w=val * 100)
 
 
-def plot_epochs_average(data, y_lim, tmin, window, freq, marks, epochs_max_number, ax):
+def plot_epochs_average(data, y_lim, tmin, window, freq, marks=[], ax=None, color="red", label="epochs mean"):
+    # Data shape: (samples, trial)
+    if not ax:
+        ax = plt.gca()
+
     t0, tf = window
     t0_frame = signal_processing.frame_at(t0, freq, tmin)
     tf_frame = signal_processing.frame_at(tf, freq, tmin)
 
-    epochs_mean = data[:, t0_frame:tf_frame, 0:epochs_max_number].mean(2)
+    samples = data.shape[0]
 
-    samples = epochs_mean.shape[1]
+    for epoch_id in range(0, data.shape[1]):
+        c_plt, = ax.plot([t0 + (s / freq) for s in range(0, samples)], data[:, epoch_id], color=color, alpha=0.05)
 
-    for channel in range(0, epochs_mean.shape[0]):
-        c_plt, = ax.plot([t0 + (s / freq) for s in range(0, samples)], epochs_mean[channel], "k", alpha=0.3, label="each channel")
+    epochs_mean = data[t0_frame:tf_frame, :].mean(1)
 
-    c2_plt, = ax.plot([t0 + (s / freq) for s in range(0, samples)], epochs_mean.mean(0), "r", linewidth=2.0, label="channels avg")
+    c2_plt, = ax.plot([t0 + (s / freq) for s in range(0, samples)], epochs_mean, color=color, linewidth=2.0, label=label)
     set_plot(plt, y_lim, window, t0, tf, marks, ax)
-    rect = draw_rectangle(plt, window, ax)
-
-    ax.legend(handles=[c_plt, c2_plt, rect])
+    draw_rectangle(plt, window, ax, label=None)
 
 
 def plot_epochs_comparition(data_dict, y_lim, tmin, window, freq, marks, epochs_max_number):
@@ -129,11 +131,11 @@ def set_plot(plt, y_lim, window, t0, tf, marks, ax):
     plt.ylim(y_lim)
     plt.xlim(window)
     # plt.xticks([x/1000.0 for x in range(-2000, 101, 100) if (x/1000.0)>=t0 and (x/1000.0)<=tf])
-    ax.axvline(marks[0])
-    ax.axvline(marks[1])
+    ax.axvline(marks[0], color="black")
+    ax.axvline(marks[1], color="black")
 
 
-def draw_rectangle(plt, window, ax=None):
+def draw_rectangle(plt, window, ax=None, label="stimulus"):
     if not ax:
         ax = plt.gca()
     rect = patches.Rectangle((window[0], -40), width=-window[0] - 0.4, height=80,
@@ -147,7 +149,7 @@ def draw_rectangle(plt, window, ax=None):
     ax.add_patch(rect)
 
     rect = patches.Rectangle((-0.4, -40), width=0.4, height=80,
-                             fill=None, label="stimulus")
+                             fill=None, edgecolor="black", label=label)
     ax.add_patch(rect)
     return rect
 
@@ -212,9 +214,9 @@ def topomap(values_by_time, montage_file, freq, cmap="Greys", fontsize=15, title
     vmax = values_by_time.feature_importances_folds_mean.max()
     # vmin, vmax = (0.0005, 0.0015)
     l = mne.channels.make_eeg_layout(mne.create_info(montage.ch_names, freq, ch_types="eeg", montage=montage))
-
+    from IPython import embed; embed()
     times = sorted(set(values_by_time.time))
-    fig, axes = plt.subplots(1, len(times), figsize=(3 / 2 * len(times), 5 / 2))
+    fig, axes = plt.subplots(1, len(times), figsize=(3 * len(times), 5))
 
     if not isinstance(axes, np.ndarray):
         axes = np.array([axes])
@@ -224,7 +226,7 @@ def topomap(values_by_time, montage_file, freq, cmap="Greys", fontsize=15, title
         time_data = values_by_time[values_by_time["time"] == time]
 
         t = list(time_data.time)[0]
-        image, _ = mne.viz.plot_topomap(list(time_data["values"]), l.pos[:, 0:2], vmin=vmin, vmax=vmax, outlines="skirt", axes=ax, show_names=False, names=montage.ch_names, show=False, cmap=cmap)
+        image, _ = mne.viz.plot_topomap(list(time_data["values"]), l.pos[:, 0:2], vmin=vmin, vmax=vmax, outlines="skirt", axes=ax, show_names=True, names=l.names, show=False, cmap=cmap)
         if top_n == len(axes) - 1:
             divider = make_axes_locatable(ax)
             ax_colorbar = divider.append_axes('right', size='5%', pad=0.05)
