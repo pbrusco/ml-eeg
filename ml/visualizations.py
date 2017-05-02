@@ -215,7 +215,7 @@ def topomap(values_by_time, montage_file, freq, cmap="Greys", fontsize=15, title
     vmax = values_by_time.feature_importances_folds_mean.max()
     # vmin, vmax = (0.0005, 0.0015)
     l = mne.channels.make_eeg_layout(mne.create_info(montage.ch_names, freq, ch_types="eeg", montage=montage))
-    from IPython import embed; embed()
+
     times = sorted(set(values_by_time.time))
     fig, axes = plt.subplots(1, len(times), figsize=(3 * len(times), 5))
 
