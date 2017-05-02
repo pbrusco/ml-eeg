@@ -3,6 +3,7 @@
 from . import signal_processing
 from . import feature_extraction
 from . import utils
+from . import data_import
 
 import numpy as np
 from scipy import signal
@@ -89,7 +90,7 @@ class FreqExtractor(EEGFeatureExtractor):
 
     def mapping(self):
         trial = np.zeros((self.n_channels, 1075))  # (channels x samples)
-        montage = mne.channels.read_montage('/home/pbrusco/projects/montages/LNI.sfp')
+        montage = data_import.read_montage('/home/pbrusco/projects/montages/LNI.sfp')
 
         ti, tf = self.time_limits
 
@@ -163,7 +164,7 @@ class WindowedExtractor(EEGFeatureExtractor):
     def mapping(self):
         i = 0
         dummy_epoch = np.zeros((self.n_channels, 1075))  # (channels x samples)
-        montage = mne.channels.read_montage(self.params["montage"])
+        montage = data_import.read_montage(self.params["montage"])
 
         res = {}
         for window_size_in_secs in self.window_sizes:

@@ -2,6 +2,7 @@
 from __future__ import division
 
 from . import signal_processing
+from . import data_import
 
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import matplotlib.pyplot as plt
@@ -208,7 +209,7 @@ def feature_importances_by_window_size(features_table, title):
 
 
 def topomap(values_by_time, montage_file, freq, cmap="Greys", fontsize=15, title=""):
-    montage = mne.channels.read_montage(montage_file)
+    montage = data_import.read_montage(montage_file)
 
     vmin = values_by_time.feature_importances_folds_mean.min()
     vmax = values_by_time.feature_importances_folds_mean.max()
