@@ -227,7 +227,7 @@ def topomap(values_by_time, montage_file, freq, cmap="Greys", fontsize=15, title
         time_data = values_by_time[values_by_time["time"] == time]
 
         t = list(time_data.time)[0]
-        image, _ = mne.viz.plot_topomap(list(time_data["values"]), l.pos[:, 0:2], vmin=vmin, vmax=vmax, outlines="skirt", axes=ax, show_names=True, names=l.names, show=False, cmap=cmap)
+        image, _ = mne.viz.plot_topomap(list(time_data["values"]), l.pos[:, 0:2], vmin=vmin, vmax=vmax, outlines="skirt", axes=ax, show_names=False, names=l.names, show=False, cmap=cmap)
         if top_n == len(axes) - 1:
             divider = make_axes_locatable(ax)
             ax_colorbar = divider.append_axes('right', size='5%', pad=0.05)
