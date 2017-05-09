@@ -3,6 +3,7 @@
 import sklearn.cross_validation
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from . import utils
 
 
@@ -22,6 +23,7 @@ class ClassificationHelper(object):
         classifiers = {"SVM": SVC(kernel="linear", probability=True, C=1, class_weight='balanced'),  # Balanced da pesos según cantidad de instancias
                        "SVMG": SVC(kernel='rbf', probability=True, gamma=0.7, C=1, class_weight='balanced'),
                        "RF": RandomForestClassifier(n_estimators=self.config["classifier_n_trees"], criterion='gini', n_jobs=-1, random_state=self.config["seed"], class_weight='balanced'),
+                       "LDA": LinearDiscriminantAnalysis(),
                        }
 
         return classifiers[self.config["classifier_name"]]
@@ -30,7 +32,7 @@ class ClassificationHelper(object):
         self.classifier.fit(X_train, y_train)
         return self.classifier.predict_proba(X_test)
 
-    def one_speaker_out_cross_validation(self, X, y, speakers, save_weights, verbose=True):
+    def one_speaker_out_cross_validation(self, X, y, speakers, verbose=True):
         folds = sklearn.cross_validation.LeaveOneLabelOut(speakers)
         results = {}
         results = {}
@@ -41,13 +43,13 @@ class ClassificationHelper(object):
             X_train, X_test = X[train_index], X[test_index]
             y_train, y_test = y[train_index], y[test_index]
 
-            results[i] = self._classify(X_train, X_test, y_train, save_weights)
+            results[i] = self._classify(X_train, X_test, y_train)
             results[i]["actual"] = y_test
             results[i]["y_ids"] = test_index
 
         return {"categories": self.classes, "results": results, "y": y}
 
-    def k_fold_cross_validation(self, X, y, n_folds, save_weights, verbose=True, subsample=False):
+    def k_fold_cross_validation(self, X, y, n_folds, verbose=True, subsample=False):
         counts = [sum(y == c) for c in self.classes]
 
         if verbose:
@@ -67,18 +69,18 @@ class ClassificationHelper(object):
                 X_train = X_train[sub_ids]
                 y_train = y_train[sub_ids]
 
-            fold_results[i] = self._classify(X_train, X_test, y_train, save_weights)
+            fold_results[i] = self._classify(X_train, X_test, y_train)
             fold_results[i]["actual"] = y_test
             fold_results[i]["y_ids"] = test_index
 
         return {"categories": self.classes, "fold_results": fold_results, "y": y}
 
-    def _classify(self, X_train, X_test, y_train, save_weights):
+    def _classify(self, X_train, X_test, y_train):
         self.classifier.fit(X_train, y_train)
         y_pred_probabilities = self.classifier.predict_proba(X_test)
         res = {"predicted_probabilities": y_pred_probabilities}
 
-        if save_weights:
+        if self.config["save_weights"]:
             if self.config["classifier_name"] == "RF":
                 feature_importances = self.classifier.feature_importances_
             elif "SVM" in self.config["classifier_name"]:

@@ -28,7 +28,7 @@ def calculate_measures(results, measures):
 def apply_measure(results, measure_function):
     measure_result, support = calculate_result_for_measure(results, measure_function)
 
-    if "permutations" in results and len(results["permutations"]) > 0:
+    if "permutations" in results and len(results["permutations"].keys()) > 0:
         permutation_values = [calculate_result_for_measure(perm_res, measure_function)[0] for perm_id, perm_res in results["permutations"].iteritems()]
         pvalue = len([p for p in permutation_values if p >= measure_result]) * 1.0 / (len(permutation_values))
     else:
