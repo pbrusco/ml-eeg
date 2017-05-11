@@ -22,7 +22,7 @@ class ClassificationHelper(object):
     def _build_classifier(self):
         classifiers = {"SVM": SVC(kernel="linear", probability=True, C=1, class_weight='balanced'),  # Balanced da pesos según cantidad de instancias
                        "SVMG": SVC(kernel='rbf', probability=True, gamma=0.7, C=1, class_weight='balanced'),
-                       "RF": RandomForestClassifier(n_estimators=self.config["classifier_n_trees"], criterion='gini', n_jobs=-1, random_state=self.config["seed"], class_weight='balanced'),
+                       "RF": RandomForestClassifier(**self.config["classifier_params"]),
                        "LDA": LinearDiscriminantAnalysis(),
                        }
 
