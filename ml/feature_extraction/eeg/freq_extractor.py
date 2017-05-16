@@ -1,7 +1,8 @@
 from eeg_feature_extractor import EEGFeatureExtractor
 
 import numpy as np
-from . import data_import
+import ml.data_import as data_import
+
 from scipy import signal
 
 

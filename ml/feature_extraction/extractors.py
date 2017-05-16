@@ -1,20 +1,26 @@
 # coding=utf-8
 
-from .eeg import eeg_feature_extraction
+import ml.feature_extraction.eeg.windowed_extractor
+import ml.feature_extraction.eeg.raw_extractor
+import ml.feature_extraction.eeg.freq_extractor
+import ml.feature_extraction.eeg.trash_extractor
+import ml.feature_extraction.audio_feature_extraction
+
 from . import audio_feature_extraction
-from . import utils
+
+from .. import utils
 
 def create(config):
     params = utils.read_config(config)
     if params["extraction_method"] == "raw":
-        return eeg_feature_extraction.RawExtractor(params)
+        return ml.feature_extraction.eeg.raw_extractor.RawExtractor(params)
     elif params["extraction_method"] == "freqs":
-        return eeg_feature_extraction.FreqExtractor(params)
+        return ml.feature_extraction.eeg.freq_extractor.FreqExtractor(params)
     elif params["extraction_method"] == "trash":
-        return eeg_feature_extraction.TrashExtractor(params)
+        return ml.feature_extraction.eeg.trash_extractor.TrashExtractor(params)
     elif params["extraction_method"] == "window_mean":
-        return eeg_feature_extraction.WindowedExtractor(params)
+        return ml.feature_extraction.eeg.windowed_extractor.WindowedExtractor(params)
     elif params["extraction_method"] == "wavelets":
-        return eeg_feature_extraction.WaveletsExtractor(params)
+        return ml.feature_extraction.eeg.wavelets_extractor.WaveletsExtractor(params)
     elif params["extraction_method"] == "opensmile":
-        return audio_feature_extraction.AcousticsExtractor(params)
+        return ml.feature_extraction.audio_feature_extraction.AcousticsExtractor(params)

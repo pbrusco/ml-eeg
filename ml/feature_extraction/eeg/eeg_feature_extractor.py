@@ -1,9 +1,9 @@
 # coding=utf-8
 from __future__ import division
 
-from . import feature_extraction
-from . import utils
+from .. import feature_extraction
 
+import ml.utils as utils
 import numpy as np
 
 
@@ -14,7 +14,7 @@ class EEGFeatureExtractor(feature_extraction.FeatureExtractor):
         self.trial_tmin = self.params["trial_tmin"]
         self.trial_tmax = self.params["trial_tmax"]
         self.sfreq = self.params["sfreq"]
-        self.n_samples = (self.trial_tmax - self.trial_tmin) * self.sfreq
+        self.n_samples = int((self.trial_tmax - self.trial_tmin) * self.sfreq)
         self.n_channels = self.params["n_channels"]
 
         self.extraction_time_limits = self.params["extraction_time_limits"]
@@ -23,7 +23,9 @@ class EEGFeatureExtractor(feature_extraction.FeatureExtractor):
 
         self.validate_extractor()
 
-        print(self)
+        if self.verbose:
+            print "extractor params"
+            print(self.__dict__)
 
     def validate_extractor(self):
         msg = "The numbers of channel to extract from are not in range"

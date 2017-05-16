@@ -1,7 +1,7 @@
 from eeg_feature_extractor import EEGFeatureExtractor
-from . import signal_processing
 import numpy as np
-from . import data_import
+import ml.data_import as data_import
+import ml.signal_processing as signal_processing
 
 
 class WindowedExtractor(EEGFeatureExtractor):

@@ -1,21 +1,17 @@
 # coding: utf-8
 import collections
-import system
 import arff
 import numpy as np
 import scipy.stats
 import time
 import os.path
 import inspect
-from . import utils
+from .. import utils
 from . import feature_extraction
+from .. import system
 
 
-class AudioExtractor(feature_extraction.FeatureExtractor):
-    pass
-
-
-class AcousticsExtractor(AudioExtractor):
+class AcousticsExtractor(feature_extraction.FeatureExtractor):
     # ; Duration
     # ; Entonación (F0 slope)
     # ; Intensity Level (Mean Intensity)
