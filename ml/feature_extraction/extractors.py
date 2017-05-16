@@ -1,9 +1,8 @@
 # coding=utf-8
 
-from . import eeg_feature_extraction
+from .eeg import eeg_feature_extraction
 from . import audio_feature_extraction
 from . import utils
-
 
 def create(config):
     params = utils.read_config(config)
