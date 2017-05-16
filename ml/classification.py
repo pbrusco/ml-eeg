@@ -10,6 +10,7 @@ from . import utils
 class ClassificationHelper(object):
     def __init__(self, config, classes=[0, 1], classifier=None):
         self.config = config
+        self.subsample = config["subsample"]
 
         if classifier:
             self.classifier = classifier
@@ -20,51 +21,41 @@ class ClassificationHelper(object):
         self.classes = classes
 
     def _build_classifier(self):
-        classifiers = {"SVM": SVC(kernel="linear", probability=True, C=1, class_weight='balanced'),  # Balanced da pesos según cantidad de instancias
-                       "SVMG": SVC(kernel='rbf', probability=True, gamma=0.7, C=1, class_weight='balanced'),
-                       "RF": RandomForestClassifier(**self.config["classifier_params"]),
-                       "LDA": LinearDiscriminantAnalysis(),
-                       }
-
-        return classifiers[self.config["classifier_name"]]
+        classifiers = {
+            "SVM": SVC(),
+            "RF": RandomForestClassifier(),
+            "LDA": LinearDiscriminantAnalysis(),
+        }
+        clf = classifiers[self.config["classifier_name"]]
+        clf.set_params(**self.config["classifier_params"])
+        return clf
 
     def classification_probas(self, X_train, y_train, X_test):
         self.classifier.fit(X_train, y_train)
         return self.classifier.predict_proba(X_test)
 
-    def one_speaker_out_cross_validation(self, X, y, speakers, verbose=True):
+    def one_speaker_out_cross_validation(self, X, y, speakers):
         folds = sklearn.cross_validation.LeaveOneLabelOut(speakers)
-        results = {}
-        results = {}
+        return self._cross_validate(folds, X, y)
 
-        for i, (train_index, test_index) in enumerate(folds):
-            if verbose:
-                utils.print_inline("speaker: {} of {} for {}".format(i + 1, len(set(speakers)), self.config["classifier_name"]))
-            X_train, X_test = X[train_index], X[test_index]
-            y_train, y_test = y[train_index], y[test_index]
-
-            results[i] = self._classify(X_train, X_test, y_train)
-            results[i]["actual"] = y_test
-            results[i]["y_ids"] = test_index
-
-        return {"categories": self.classes, "results": results, "y": y}
-
-    def k_fold_cross_validation(self, X, y, n_folds, verbose=True, subsample=False):
+    def k_fold_cross_validation(self, X, y, n_folds, verbose=True):
         counts = [sum(y == c) for c in self.classes]
-
         if verbose:
             print("running classifiers for", list(zip(self.classes, counts)))
         folds = sklearn.cross_validation.StratifiedKFold(y, n_folds=n_folds, random_state=self.config["seed"])
+        return self._cross_validate(folds, X, y)
 
+    def _cross_validate(self, folds, X, y):
         fold_results = {}
+        n_folds = len(folds)
 
         for i, (train_index, test_index) in enumerate(folds):
-            if verbose:
-                utils.print_inline("K-fold: {} of {} for {}".format(i + 1, n_folds, self.config["classifier_name"]))
+            utils.print_inline("fold: {} of {}".format(i + 1, n_folds))
+
             X_train, X_test = X[train_index], X[test_index]
             y_train, y_test = y[train_index], y[test_index]
 
-            if subsample:
+            if self.subsample:
                 sub_ids = utils.subsample_ids(y_train)
                 X_train = X_train[sub_ids]
                 y_train = y_train[sub_ids]

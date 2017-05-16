@@ -7,7 +7,6 @@ from . import data_import
 
 import numpy as np
 from scipy import signal
-import mne
 
 
 class EEGFeatureExtractor(feature_extraction.FeatureExtractor):
