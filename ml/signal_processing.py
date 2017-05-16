@@ -18,7 +18,7 @@ def wav_duration(filename):
 def sliding_window(sequence, window_size_in_frames, step_in_frames, time_limits, t0, freq, debugging=False):
     frame_duration = 1.0 / freq
     sec_length = sequence.shape[1]
-    num_of_chunks = ((sec_length - window_size_in_frames) / step_in_frames) + 1
+    num_of_chunks = ((sec_length - window_size_in_frames) // step_in_frames) + 1
     ti, tf = time_limits
 
     for i in range(0, num_of_chunks * step_in_frames, step_in_frames):
