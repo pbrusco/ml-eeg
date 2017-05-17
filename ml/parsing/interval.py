@@ -14,4 +14,11 @@ class Interval(EqualityMixin):
         yield (self.start, self.end, self.value)
 
     def __repr__(self):
-        return "I({a}, {b}, {c} [{d}])".format(a=self.start, b=self.end, c=self.value, d=self.duration)
+        return "I({a}, {b}, {c})".format(a=self.start, b=self.end, c=self.value)
+
+    def as_tuple(self):
+        return (self.start, self.end, self.value)
+
+    def __iter__(self):
+        for i in [self.start, self.end, self.value]:
+            yield i

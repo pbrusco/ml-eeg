@@ -6,9 +6,9 @@ import scipy.stats
 import time
 import os.path
 import inspect
-from .. import utils
-from . import feature_extraction
-from .. import system
+import ml.utils as utils
+import ml.system as system
+from .. import feature_extraction
 
 
 class AcousticsExtractor(feature_extraction.FeatureExtractor):

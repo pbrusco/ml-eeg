@@ -6,7 +6,7 @@ import ml.feature_extraction.eeg.freq_extractor
 import ml.feature_extraction.eeg.trash_extractor
 import ml.feature_extraction.audio_feature_extraction
 
-from . import audio_feature_extraction
+import ml.feature_extraction.audio.acoustics_extractor
 
 from .. import utils
 
@@ -23,4 +23,4 @@ def create(config):
     elif params["extraction_method"] == "wavelets":
         return ml.feature_extraction.eeg.wavelets_extractor.WaveletsExtractor(params)
     elif params["extraction_method"] == "opensmile":
-        return ml.feature_extraction.audio_feature_extraction.AcousticsExtractor(params)
+        return ml.feature_extraction.audio.acoustics_extractor.AcousticsExtractor(params)

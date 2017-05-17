@@ -1,8 +1,8 @@
 # coding=utf-8
 
-from . import system
-from . import interval
-from . import wavesurfer
+import ml.system as system
+from . interval
+from . intervals
 
 
 class ParseError(Exception):
@@ -31,7 +31,7 @@ class WaveParser:
 
             intervals.append(interval)
 
-        return wavesurfer.WaveSurfer(intervals)
+        return wavesurfer.Intervals(intervals)
 
 
 def read(wavesurfer_file):

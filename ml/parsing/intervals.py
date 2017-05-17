@@ -1,10 +1,10 @@
 # coding=utf-8
 
 from . import interval
-from . import system
+import ml.system as system
 
 
-class WaveSurfer():
+class Intervals():
     def __init__(self, intervals):
         self.intervals = intervals
         self.counter = 0
@@ -18,6 +18,9 @@ class WaveSurfer():
     def __iter__(self):
         for i in self.intervals:
             yield i
+
+    def __getitem__(self, idx):
+        return list(self)[idx]
 
     def diff(self, x):
         differences = []
@@ -89,4 +92,7 @@ class WaveSurfer():
                 else:
                     current_ipu = interval.Interval(current_ipu.start, i.end, "1")
 
-        return WaveSurfer(vad_intervals)
+        return Intervals(vad_intervals)
+
+    def as_list(self):
+        return [i.as_tuple() for i in self]
