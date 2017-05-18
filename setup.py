@@ -52,12 +52,7 @@ setup(
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
-        'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
     ],
 
     # What does your project relate to?
@@ -90,7 +85,7 @@ setup(
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
     package_data={
-        'ml': ['voice-analysis-voiced.praat', 'voice-analysis.praat'],
+        'ml': ['./feature_extraction/audio/voice-analysis-voiced.praat', './feature_extraction/audio/voice-analysis.praat'],
     },
 
     # Although 'package_data' is the preferred approach, in some case you may
