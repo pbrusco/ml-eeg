@@ -14,25 +14,31 @@ import random
 HOME = expanduser("~")
 
 
-def read_config(config_input, require=[]):
+def read_config(config_input, require=[], optional=[]):
     if isinstance(config_input, basestring):
         if not system.exists(config_input):
             raise Exception("missing config: {}".format(config_input))
         config = configparser.SafeConfigParser()
         config.read([config_input])
-        res = collections.defaultdict(str)
+        res = {}
         for k, v in config.items("DEFAULT"):
             res[k] = eval(v)
-
-        for required_field in require:
-            if required_field not in res:
-                raise Exception("Missing required field: {} in {}".format(required_field, config_input))
-
-        return res
     elif isinstance(config_input, dict):
-        return config_input
+        res = config_input
     else:
         raise Exception("config type not allowed (type={})".format(type(config_input)))
+
+    missing_fields = [f for f in require if f not in res]
+
+    if len(missing_fields) > 0:
+        system.error("Missing fields in config:\n\t\t" + "\n\t\t".join(missing_fields))
+        raise Exception("Missing required fields configuration")
+
+    for opt in optional:
+        if opt not in res:
+            res[opt] = None
+            
+    return res
 
 
 def read_list(filename):

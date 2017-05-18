@@ -9,15 +9,18 @@ import numpy as np
 
 class EEGFeatureExtractor(feature_extraction.FeatureExtractor):
     def __init__(self, config):
-        self.params = utils.read_config(config)
+        self.params = utils.read_config(config, require=["trial_tmin", "trial_tmax", "sfreq", "channels_to_extract_from", "extraction_tmin", "extraction_tmax"])
 
-        self.trial_tmin = self.params["trial_tmin"]
-        self.trial_tmax = self.params["trial_tmax"]
-        self.sfreq = self.params["sfreq"]
+        self.trial_tmin = float(self.params["trial_tmin"])
+        self.trial_tmax = float(self.params["trial_tmax"])
+        self.sfreq = float(self.params["sfreq"])
         self.n_samples = int((self.trial_tmax - self.trial_tmin) * self.sfreq)
         self.n_channels = self.params["n_channels"]
 
-        self.extraction_time_limits = self.params["extraction_time_limits"]
+        self.extraction_tmin = self.params["extraction_tmin"]
+        self.extraction_tmax = self.params["extraction_tmax"]
+        self.extraction_time_limits = [self.extraction_tmin, self.extraction_tmax]
+
         self.channels_to_extract_from = np.array(self.params["channels_to_extract_from"])
         self.verbose = self.params["verbose"] if ("verbose" in self.params) else None
 
@@ -35,10 +38,10 @@ class EEGFeatureExtractor(feature_extraction.FeatureExtractor):
         assert self.trial_tmin < self.trial_tmax, msg
 
         msg = "extraction time is not valid (should be contained in [tmin, tmax] range)"
-        in_range = self.extraction_time_limits[0] >= self.trial_tmin and \
-                   self.extraction_time_limits[0] < self.trial_tmax and \
-                   self.extraction_time_limits[1] > self.trial_tmin and \
-                   self.extraction_time_limits[1] <= self.trial_tmax and \
-                   self.extraction_time_limits[0] < self.extraction_time_limits[1]
+        in_range = self.extraction_tmin >= self.trial_tmin and \
+                   self.extraction_tmin < self.trial_tmax and \
+                   self.extraction_tmax > self.trial_tmin and \
+                   self.extraction_tmax <= self.trial_tmax and \
+                   self.extraction_tmin < self.extraction_tmax
 
         assert in_range, msg
