@@ -4,11 +4,11 @@ import ml.feature_extraction.eeg.windowed_extractor
 import ml.feature_extraction.eeg.raw_extractor
 import ml.feature_extraction.eeg.freq_extractor
 import ml.feature_extraction.eeg.trash_extractor
-import ml.feature_extraction.audio_feature_extraction
 
 import ml.feature_extraction.audio.acoustics_extractor
 
 from .. import utils
+
 
 def create(config):
     params = utils.read_config(config)

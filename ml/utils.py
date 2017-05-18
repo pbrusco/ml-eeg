@@ -14,7 +14,7 @@ import random
 HOME = expanduser("~")
 
 
-def read_config(config_input):
+def read_config(config_input, require=[]):
     if isinstance(config_input, basestring):
         if not system.exists(config_input):
             raise Exception("missing config: {}".format(config_input))
@@ -23,6 +23,11 @@ def read_config(config_input):
         res = collections.defaultdict(str)
         for k, v in config.items("DEFAULT"):
             res[k] = eval(v)
+
+        for required_field in require:
+            if required_field not in res:
+                raise Exception("Missing required field: {} in {}".format(required_field, config_input))
+
         return res
     elif isinstance(config_input, dict):
         return config_input
