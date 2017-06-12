@@ -6,7 +6,13 @@ import ml.system as system
 
 class Intervals():
     def __init__(self, intervals):
+        if len(intervals) > 0 and (type(intervals[0]) is tuple or type(intervals[0]) is list):
+            intervals = [interval.from_tuple(t) for t in intervals]
+
         self.intervals = intervals
+        self.__reset__()
+
+    def __reset__(self):
         self.counter = 0
 
     def __eq__(self, other):
@@ -22,6 +28,9 @@ class Intervals():
     def __getitem__(self, idx):
         return list(self)[idx]
 
+    def __len__(self):
+        return len(self.intervals)
+
     def diff(self, x):
         differences = []
         if len(self.intervals) != len(x.intervals):
@@ -33,10 +42,33 @@ class Intervals():
                 raise Exception("Intervals are not the same")
 
             if i.value != self.current().value:
-                differences.append((self.counter + 1, i.start, i.end))
+                differences.append((self.counter + 1, i.start, i.end, i.value, self.current().value))
             next(self)
 
+        self.__reset__()
+
         return differences
+
+    def merge(self, x):
+        if len(self.intervals) != len(x.intervals):
+            system.warning("number of intervals: {} vs {}".format(len(self.intervals), len(x.intervals)))
+
+        res = []
+
+        for i in x:
+            if i.start != self.current().start:
+                system.error("different starts on interval ({}) {} vs {}".format(self.counter + 1, i.start, self.current().start))
+                raise Exception("Intervals are not the same")
+
+            if i.value == self.current().value:
+                res.append(i)
+            else:
+                res.append(interval.Interval(i.start, i.end, "A"))
+                
+            next(self)
+
+        self.__reset__()
+        return Intervals(res)
 
     def current(self):
         return self.intervals[self.counter]

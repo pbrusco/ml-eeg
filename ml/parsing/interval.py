@@ -19,6 +19,6 @@ class Interval(EqualityMixin):
     def as_tuple(self):
         return (self.start, self.end, self.value)
 
-    def __iter__(self):
-        for i in [self.start, self.end, self.value]:
-            yield i
+
+def from_tuple(t):
+    return Interval(t[0], t[1], t[2])

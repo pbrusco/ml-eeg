@@ -34,6 +34,8 @@ def cp(src, dst):
 
 
 def rm(filename):
+    if exists(filename):
+        warning("removing {}".format(filename))
     run_external_command("rm", non_named_params=[filename])
 
 

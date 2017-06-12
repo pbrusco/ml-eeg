@@ -37,7 +37,7 @@ def read_config(config_input, require=[], optional=[]):
     for opt in optional:
         if opt not in res:
             res[opt] = None
-            
+
     return res
 
 
@@ -102,11 +102,11 @@ def absolute_to_user_path(filename):
     return filename.replace(HOME + "/", "~/")
 
 
-def save_list(lines, filename, verbose=True):
+def save_list(lines, filename, verbose=True, separator="\t"):
     with open(filename, "w") as fn:
         for line in lines:
             if type(line) is list or type(line) is tuple:
-                fn.write("\t".join(line) + "\n")
+                fn.write(separator.join([str(l) for l in line]) + "\n")
             else:
                 fn.write(line + "\n")
     if verbose:

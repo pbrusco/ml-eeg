@@ -38,7 +38,6 @@ class TextGridParser:
         else:
             self.pointer += 1
 
-
     def current(self):
         return self.lines[self.pointer]
 
@@ -46,7 +45,6 @@ class TextGridParser:
         v = self.current()
         self.next()
         return v
-
 
     def find_item(self):
         item = None
@@ -63,7 +61,6 @@ class TextGridParser:
                 return classs, name
             else:
                 self.next()
-
 
     def parse_interval_tier(self):
         res = []
@@ -92,7 +89,6 @@ class TextGridParser:
             mark = get("mark", self.get_and_move())
             res.append((float(number), mark))
         return res
-
 
     def parse(self):
         size = None

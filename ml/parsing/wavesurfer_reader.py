@@ -1,8 +1,8 @@
 # coding=utf-8
 
 import ml.system as system
-from . interval
-from . intervals
+from . import interval
+from . import intervals
 
 
 class ParseError(Exception):
@@ -18,20 +18,17 @@ class WaveParser:
     def parse(self):
         values = [x.split() for x in self.lines]
 
-        def as_interval(y):
-            return interval.Interval(y[0], y[1], y[2])
-
-        intervals = []
-        for v in values:
-            i = as_interval(v)
+        res = []
+        for t in values:
+            i = interval.from_tuple(t)
             if i.start != self.lastEnd or i.end < self.lastEnd:
                 raise ParseError("Malformed Wavesurfer, check for missing time values")
             else:
                 self.lastEnd = i.end
 
-            intervals.append(interval)
+            res.append(interval)
 
-        return wavesurfer.Intervals(intervals)
+        return intervals.Intervals(res)
 
 
 def read(wavesurfer_file):
