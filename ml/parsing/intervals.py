@@ -31,6 +31,27 @@ class Intervals():
     def __len__(self):
         return len(self.intervals)
 
+    def validate_values(self, values):
+        warnings = []
+        for idx, i in enumerate(self.intervals):
+            if i.value not in values:
+                warnings.append("(id: {}, time: {}) invalid label \"{}\"".format(idx + 1, i.start, i.value))
+        return warnings
+
+    def validate_for_diff(self, x):
+        warnings = []
+        if len(self.intervals) != len(x.intervals):
+            warnings.append("number of intervals: {} vs {}".format(len(self.intervals), len(x.intervals)))
+        for i in x:
+            if i.start != self.current().start:
+                warnings.append("different starts on interval ({}) {} vs {}".format(self.counter + 1, i.start, self.current().start))
+                break
+            next(self)
+
+        self.__reset__()
+
+        return warnings
+
     def diff(self, x):
         differences = []
         if len(self.intervals) != len(x.intervals):
@@ -38,9 +59,8 @@ class Intervals():
 
         for i in x:
             if i.start != self.current().start:
-                system.error("different starts on interval ({}) {} vs {}".format(self.counter + 1, i.start, self.current().start))
-                raise Exception("Intervals are not the same")
-
+                system.warning("different starts on interval ({}) {} vs {}".format(self.counter + 1, i.start, self.current().start))
+                break
             if i.value != self.current().value:
                 differences.append((self.counter + 1, i.start, i.end, i.value, self.current().value))
             next(self)
@@ -64,7 +84,7 @@ class Intervals():
                 res.append(i)
             else:
                 res.append(interval.Interval(i.start, i.end, "A"))
-                
+
             next(self)
 
         self.__reset__()
