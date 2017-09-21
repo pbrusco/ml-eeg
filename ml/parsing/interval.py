@@ -9,7 +9,7 @@ class Interval(EqualityMixin):
         self.end = float(end)
         self.value = value
         self.duration = self.end - self.start
-
+        
     def __iter__(self):
         yield (self.start, self.end, self.value)
 

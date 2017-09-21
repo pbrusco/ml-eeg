@@ -62,7 +62,7 @@ def read_list(filename):
 
 
 def read_wavesurfer(filename):
-    return [(float(t0), float(tf), lbl) for (t0, tf, lbl) in read_list(filename)]
+    return [(float(line[0]), float(line[1]), " ".join(line[2:])) for line in read_list(filename)]
 
 
 def read_ipus(vad_filename):

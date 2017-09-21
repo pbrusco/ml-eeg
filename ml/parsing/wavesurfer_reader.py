@@ -26,7 +26,7 @@ class WaveParser:
             else:
                 self.lastEnd = i.end
 
-            res.append(interval)
+            res.append(i)
 
         return intervals.Intervals(res)
 
