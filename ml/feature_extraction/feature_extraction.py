@@ -8,7 +8,7 @@ class FeatureExtractor(object):
     def __init__(self, config):
         raise NotImplementedError("{} must implement the '__init__' method".format(self))
 
-    def batch_extract(self, instances_list):
+    def batch_extract(self, instances):
         raise NotImplementedError("{} must implement the 'extract_batch' method".format(self))
 
     def feature_names(self):

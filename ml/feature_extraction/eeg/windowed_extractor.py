@@ -2,16 +2,28 @@ from eeg_feature_extractor import EEGFeatureExtractor
 import numpy as np
 import ml.data_import as data_import
 import ml.signal_processing as signal_processing
+import ml.system
 
 
 class WindowedExtractor(EEGFeatureExtractor):
     def __init__(self, config):
         super(WindowedExtractor, self).__init__(config)
         self.window_sizes = self.params["window_sizes"]
-        self.step_in_frames = self.params["step_in_frames"]
+        frame_duration = 1.0 / self.sfreq
+
+        if "step_in_frames" in self.params:
+            self.step_in_frames = self.params["step_in_frames"]
+            self.step_in_secs = self.params["step_in_frames"] * frame_duration
+
+        elif "step_in_secs" in self.params:
+            self.step_in_secs = self.params["step_in_secs"]
+            self.step_in_frames = int(self.step_in_secs / frame_duration)
+        else:
+            raise Exception("missing step parameter")
+        ml.system.info("windowed extractor: {} every {} frames ({} ms)".format(["{} ms".format(s*1000.0) for s in self.window_sizes], self.step_in_frames, 1000.0 * self.step_in_secs))
 
     def extract(self, trial):
-        # Trial shape: (channels x samples)
+        ml.system.info("Trial shape: (channels x samples) {}".format(trial.shape))
         assert self.n_channels == trial.shape[0], "the number of channels in the extractor configuration doen't match {} vs {}".format(self.n_channels, trial.shape[0])
         assert self.n_samples == trial.shape[1], "the number of samples in the extractor configuration doen't match {} vs {}".format(self.n_samples, trial.shape[1])
 

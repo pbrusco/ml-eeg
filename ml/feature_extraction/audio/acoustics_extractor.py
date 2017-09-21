@@ -22,3 +22,10 @@ class AcousticsExtractor(feature_extraction.FeatureExtractor):
         feat.update(self.intensity_extractor.extract(instance))
         feat.update(self.voice_quality_extractor.extract(instance))
         return feat
+
+    def extract_batch(self, instances):
+        durations = [i.audio.duration_seconds for i in instances]
+        features1 = self.pitch_extractor.extract_batch(instances)
+        features2 = self.intensity_extractor.extract_batch(instances)
+        features3 = self.voice_quality_extractor.extract_batch(instances)
+        from IPython import embed; embed()
