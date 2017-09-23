@@ -1,13 +1,13 @@
 # coding=utf-8
 
-from . import interval
 import ml.system as system
+import textgrid
 
 
 class Intervals():
     def __init__(self, intervals):
         if len(intervals) > 0 and (type(intervals[0]) is tuple or type(intervals[0]) is list):
-            intervals = [interval.from_tuple(t) for t in intervals]
+            intervals = [textgrid.interval(t[0], t[1], t[2]) for t in intervals]
 
         self.intervals = intervals
         self.__reset__()
@@ -34,8 +34,8 @@ class Intervals():
     def validate_values(self, values):
         warnings = []
         for idx, i in enumerate(self.intervals):
-            if i.value not in values:
-                warnings.append("(id: {}, time: {}) invalid label \"{}\"".format(idx + 1, i.start, i.value))
+            if i.mark not in values:
+                warnings.append("(id: {}, time: {}) invalid label \"{}\"".format(idx + 1, i.minTime, i.mark))
         return warnings
 
     def validate_for_diff(self, x):
@@ -43,8 +43,8 @@ class Intervals():
         if len(self.intervals) != len(x.intervals):
             warnings.append("number of intervals: {} vs {}".format(len(self.intervals), len(x.intervals)))
         for i in x:
-            if i.start != self.current().start:
-                warnings.append("different starts on interval ({}) {} vs {}".format(self.counter + 1, i.start, self.current().start))
+            if i.minTime != self.current().minTime:
+                warnings.append("different starts on interval ({}) {} vs {}".format(self.counter + 1, i.minTime, self.current().minTime))
                 break
             next(self)
 
@@ -58,11 +58,11 @@ class Intervals():
             system.warning("number of intervals: {} vs {}".format(len(self.intervals), len(x.intervals)))
 
         for i in x:
-            if i.start != self.current().start:
-                system.warning("different starts on interval ({}) {} vs {}".format(self.counter + 1, i.start, self.current().start))
+            if i.minTime != self.current().minTime:
+                system.warning("different starts on interval ({}) {} vs {}".format(self.counter + 1, i.minTime, self.current().minTime))
                 break
-            if i.value != self.current().value:
-                differences.append((self.counter + 1, i.start, i.end, i.value, self.current().value))
+            if i.mark != self.current().mark:
+                differences.append((self.counter + 1, i.minTime, i.maxTime, i.mark, self.current().mark))
             next(self)
 
         self.__reset__()
@@ -76,14 +76,14 @@ class Intervals():
         res = []
 
         for i in x:
-            if i.start != self.current().start:
-                system.error("different starts on interval ({}) {} vs {}".format(self.counter + 1, i.start, self.current().start))
+            if i.minTime != self.current().minTime:
+                system.error("different starts on interval ({}) {} vs {}".format(self.counter + 1, i.minTime, self.current().minTime))
                 raise Exception("Intervals are not the same")
 
-            if i.value == self.current().value:
+            if i.mark == self.current().mark:
                 res.append(i)
             else:
-                res.append(interval.Interval(i.start, i.end, "A"))
+                res.append(textgrid.Interval(i.minTime, i.maxTime, "A"))
 
             next(self)
 
@@ -97,7 +97,7 @@ class Intervals():
         if self.has_next():
             self.counter += 1
             val = self.intervals[self.counter]
-            if value and value != val.value:
+            if value and value != val.mark:
                 return self.next(value)
             else:
                 return val
@@ -107,12 +107,12 @@ class Intervals():
     def values_in_range(self, start, end):
         values = []
         for i in self.intervals:
-            if i.end < start:
+            if i.maxTime < start:
                 continue
-            elif i.start > end:
+            elif i.minTime > end:
                 break
             else:
-                values.append(i.value)
+                values.append(i.mark)
         return values
 
     def next_until(self, time):
@@ -132,19 +132,19 @@ class Intervals():
         vad_intervals = []
         current_ipu = None
         for i in self:
-            if i.value == "#":
+            if i.mark == "#":
                 if current_ipu:
                     vad_intervals.append(current_ipu)
                     current_ipu = None
-                vad_intervals.append(interval.Interval(i.start, i.end, "0"))
+                vad_intervals.append(textgrid.Interval(i.minTime, i.maxTime, "0"))
 
             else:
                 if not current_ipu:
-                    current_ipu = interval.Interval(i.start, i.end, "1")
+                    current_ipu = textgrid.Interval(i.minTime, i.maxTime, "1")
                 else:
-                    current_ipu = interval.Interval(current_ipu.start, i.end, "1")
+                    current_ipu = textgrid.Interval(current_ipu.minTime, i.maxTime, "1")
 
         return Intervals(vad_intervals)
 
     def as_list(self):
-        return [i.as_tuple() for i in self]
+        return [(i.minTime, i.maxTime, i.mark) for i in self]
