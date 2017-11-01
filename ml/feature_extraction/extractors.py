@@ -22,5 +22,5 @@ def create(config):
         return ml.feature_extraction.eeg.windowed_extractor.WindowedExtractor(params)
     elif params["extraction_method"] == "wavelets":
         return ml.feature_extraction.eeg.wavelets_extractor.WaveletsExtractor(params)
-    elif params["extraction_method"] == "opensmile":
+    elif params["extraction_method"] == "acustics":
         return ml.feature_extraction.audio.acoustics_extractor.AcousticsExtractor(params)
