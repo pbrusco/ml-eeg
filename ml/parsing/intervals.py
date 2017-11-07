@@ -61,8 +61,11 @@ class Intervals():
             if i.minTime != self.current().minTime:
                 system.warning("different starts on interval ({}) {} vs {}".format(self.counter + 1, i.minTime, self.current().minTime))
                 break
-            if i.mark != self.current().mark:
+            if i.mark.strip() != self.current().mark.strip():
                 differences.append((self.counter + 1, i.minTime, i.maxTime, i.mark, self.current().mark))
+            elif i.mark != self.current().mark:
+                system.warning("Labels '{}' vs '{}' ignored from diff".format(i.mark, self.current().mark))
+
             next(self)
 
         self.__reset__()
