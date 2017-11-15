@@ -20,7 +20,7 @@ def handle_nans(nan_action, X, features_names):
         features_names = features_names + ["was_nan" + f for f in features_names]
 
     if nan_action == "replace_by_zero":
-        print("converting {} NaN to 0s".format(np.count_nonzero(~np.isnan(X))))
+        print(("converting {} NaN to 0s".format(np.count_nonzero(~np.isnan(X)))))
         X = np.nan_to_num(X)
         deleted_rows = np.array([])
 

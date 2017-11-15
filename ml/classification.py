@@ -16,7 +16,7 @@ class ClassificationHelper(object):
             self.classifier = classifier
         else:
             self.classifier = self._build_classifier()
-            print("Using {} classifier".format(self.classifier))
+            print(("Using {} classifier".format(self.classifier)))
 
         self.classes = classes
 
@@ -41,7 +41,7 @@ class ClassificationHelper(object):
     def k_fold_cross_validation(self, X, y, n_folds, verbose=True):
         counts = [sum(y == c) for c in self.classes]
         if verbose:
-            print("running classifiers for", list(zip(self.classes, counts)))
+            print(("running classifiers for", list(zip(self.classes, counts))))
         folds = sklearn.cross_validation.StratifiedKFold(y, n_folds=n_folds, random_state=self.config["seed"])
         return self._cross_validate(folds, X, y)
 

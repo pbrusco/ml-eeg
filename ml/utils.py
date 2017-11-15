@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from __future__ import print_function
+
 
 import numpy as np
 import sys
@@ -15,7 +15,7 @@ HOME = expanduser("~")
 
 
 def read_config(config_input, require=[], optional=[]):
-    if isinstance(config_input, basestring):
+    if isinstance(config_input, str):
         if not system.exists(config_input):
             raise Exception("missing config: {}".format(config_input))
         config = configparser.SafeConfigParser()
@@ -75,14 +75,14 @@ def read_turns(turns_filename):
 
 def read_csv(filename, delimiter=","):
     res = []
-    with open(filename, 'rb') as csvfile:
+    with open(filename) as csvfile:
         spamreader = csv.reader(csvfile, delimiter=delimiter)
         for i, row in enumerate(spamreader):
             if i == 0:
                 header = row
             else:
                 res.append(dict(list(zip(header, row))))
-    return res
+        return res
 
 
 def read_dat_table(filename, header_filename):
@@ -127,7 +127,7 @@ def call_with_necesary_params_only(fn, params):
     args = fn.__code__.co_varnames[:arg_count]
 
     args_dict = {}
-    for k, v in params.items():
+    for k, v in list(params.items()):
         if k in args:
             args_dict[k] = v
 

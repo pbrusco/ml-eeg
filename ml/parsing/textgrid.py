@@ -1,7 +1,7 @@
 # coding=utf-8
 
 import ml.system as system
-import textgrid # pip install git+http://github.com/kylebgorman/textgrid.git
+from . import textgrid # pip install git+http://github.com/kylebgorman/textgrid.git
 
 
 def read(textgrid_file):

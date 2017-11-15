@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from __future__ import division
+
 import numpy as np
 from sklearn import metrics
 from . import utils
@@ -28,8 +28,8 @@ def calculate_measures(results, measures):
 def apply_measure(results, measure_function):
     measure_result, support = calculate_result_for_measure(results, measure_function)
 
-    if "permutations" in results and len(results["permutations"].keys()) > 0:
-        permutation_values = [calculate_result_for_measure(perm_res, measure_function)[0] for perm_id, perm_res in results["permutations"].iteritems()]
+    if "permutations" in results and len(list(results["permutations"].keys())) > 0:
+        permutation_values = [calculate_result_for_measure(perm_res, measure_function)[0] for perm_id, perm_res in results["permutations"].items()]
         pvalue = len([p for p in permutation_values if p >= measure_result]) * 1.0 / (len(permutation_values))
     else:
         pvalue = np.nan
@@ -47,15 +47,15 @@ def accuracy_fn(actual, predicted_probabilities, categories):
 
 
 def y_indices_from_fold_result(fold_results):
-    return np.array(utils.flatten([fold_res["y_ids"] for k, fold_res in fold_results.iteritems()]))
+    return np.array(utils.flatten([fold_res["y_ids"] for k, fold_res in fold_results.items()]))
 
 
 def y_true_from_fold_result(fold_results):
-    return np.array(utils.flatten([fold_res["actual"] for k, fold_res in fold_results.iteritems()]))
+    return np.array(utils.flatten([fold_res["actual"] for k, fold_res in fold_results.items()]))
 
 
 def y_score_from_fold_result(fold_results):
-    return np.array(utils.flatten([fold_res["predicted_probabilities"][:, 1] for k, fold_res in fold_results.iteritems()]))
+    return np.array(utils.flatten([fold_res["predicted_probabilities"][:, 1] for k, fold_res in fold_results.items()]))
 
 
 def calculate_result_for_measure(results, measure):
@@ -74,7 +74,7 @@ def calculate_result_for_measure(results, measure):
 def feature_importances(fold_results):
     all_feature_importances = []
 
-    for fold, fold_result in fold_results.iteritems():
+    for fold, fold_result in fold_results.items():
         all_feature_importances.append(fold_result["classifier_weights"])
 
     feature_importances_by_folds = np.array(all_feature_importances)

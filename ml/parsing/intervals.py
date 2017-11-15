@@ -1,7 +1,7 @@
 # coding=utf-8
 
 import ml.system as system
-import textgrid
+from . import textgrid
 
 
 class Intervals():

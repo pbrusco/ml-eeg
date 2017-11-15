@@ -1,4 +1,4 @@
-from eeg_feature_extractor import EEGFeatureExtractor
+from .eeg_feature_extractor import EEGFeatureExtractor
 import numpy as np
 import ml.data_import as data_import
 import ml.signal_processing as signal_processing
@@ -31,7 +31,7 @@ class WindowedExtractor(EEGFeatureExtractor):
         for window_size_in_secs in self.window_sizes:
             ws_frames = int(window_size_in_secs * self.sfreq)
             if self.verbose:
-                print("ws frames: ", ws_frames)
+                print(("ws frames: ", ws_frames))
             for starting_sample, chunk in signal_processing.sliding_window(trial,
                                                                            window_size_in_frames=ws_frames,
                                                                            step_in_frames=self.step_in_frames,
@@ -80,4 +80,4 @@ class WindowedExtractor(EEGFeatureExtractor):
         return res
 
     def feature_names(self):
-        return [c["name"] for c in self.mapping().values()]
+        return [c["name"] for c in list(self.mapping().values())]

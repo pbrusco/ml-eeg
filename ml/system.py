@@ -66,7 +66,7 @@ def run_external_command(cmd, **args):
     else:
         no_named = ""
 
-    for (arg, val) in args.items():
+    for (arg, val) in list(args.items()):
         cmd += " --{} {}".format(arg, val)
 
     cmd += no_named
@@ -85,7 +85,7 @@ def run_script(module, **args):
     else:
         skip = False
 
-    for (arg, val) in args.items():
+    for (arg, val) in list(args.items()):
         cmd += " --{} '{}'".format(arg, val)
 
     if skip:
@@ -95,7 +95,7 @@ def run_script(module, **args):
         try:
             return module.main(**args)
         except Exception:
-            print("Error running {} with args {}".format(module.__name__, args))
+            print(("Error running {} with args {}".format(module.__name__, args)))
             raise
 
 

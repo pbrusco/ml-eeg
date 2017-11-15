@@ -1,4 +1,4 @@
-from eeg_feature_extractor import EEGFeatureExtractor
+from .eeg_feature_extractor import EEGFeatureExtractor
 
 import numpy as np
 import ml.data_import as data_import
@@ -67,4 +67,4 @@ class FreqExtractor(EEGFeatureExtractor):
         return res
 
     def feature_names(self):
-        return [c["name"] for c in self.mapping().values()]
+        return [c["name"] for c in list(self.mapping().values())]

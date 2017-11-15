@@ -1,5 +1,5 @@
 # coding=utf-8
-from __future__ import division
+
 
 from .. import feature_extraction
 
@@ -27,8 +27,8 @@ class EEGFeatureExtractor(feature_extraction.FeatureExtractor):
         self.validate_extractor()
 
         if self.verbose:
-            print "extractor params"
-            print(self.__dict__)
+            print("extractor params")
+            print((self.__dict__))
 
     def validate_extractor(self):
         msg = "The numbers of channel to extract from are not in range"

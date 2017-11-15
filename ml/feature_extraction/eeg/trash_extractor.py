@@ -1,4 +1,4 @@
-from eeg_feature_extractor import EEGFeatureExtractor
+from .eeg_feature_extractor import EEGFeatureExtractor
 import numpy as np
 
 
