@@ -55,7 +55,7 @@ class IntensityExtractor(feature_extraction.FeatureExtractor):
         return feat
 
     def intensity_track(self, instance):
-        data = ml.opensmile.call_script(self.temp_folder, self.params["intensity_config"], instance.filename)
+        data = ml.opensmile.call_script(self.params["smile_extract_path"], self.temp_folder, self.params["intensity_config"], instance.filename)
 
         times = ml.parsing.arff.get_column(data, "frameTime")
         intensities = ml.parsing.arff.get_column(data, "pcm_intensity_sma")

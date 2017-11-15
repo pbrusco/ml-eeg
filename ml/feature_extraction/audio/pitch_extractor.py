@@ -60,7 +60,7 @@ class PitchExtractor(feature_extraction.FeatureExtractor):
         return feat
 
     def pitch_track(self, instance):
-        data = ml.opensmile.call_script(self.temp_folder, self.params["pitch_config"], instance.filename)
+        data = ml.opensmile.call_script(self.params["smile_extract_path"], self.temp_folder, self.params["pitch_config"], instance.filename)
 
         times = ml.parsing.arff.get_column(data, "frameTime")
         pitch = ml.parsing.arff.get_column(data, "F0final_sma")

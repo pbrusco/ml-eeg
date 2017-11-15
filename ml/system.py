@@ -47,7 +47,7 @@ def run_command(cmd, skip=False, verbose=True):
             print(('\n (skiping) \x1b[2;33;40m' + cmd + '\x1b[0m'))
     if not skip:
         try:
-            return subprocess.check_output(cmd, shell=True)
+            return subprocess.check_output(cmd, shell=True).decode("utf-8")
         except subprocess.CalledProcessError as e:
             print(('\n \x1b[2;31;40m (ERROR)' + cmd + '\x1b[0m'))
             raise e
