@@ -65,8 +65,8 @@ def read_wavesurfer(filename):
     return [(float(line[0]), float(line[1]), " ".join(line[2:])) for line in read_list(filename)]
 
 
-def read_ipus(vad_filename):
-    return [(t0, tf) for (t0, tf, lbl) in read_wavesurfer(vad_filename) if lbl == "1"]
+def read_ipus(vad_filename, zero_tag = "0"):
+    return [(t0, tf) for (t0, tf, lbl) in read_wavesurfer(vad_filename) if lbl != zero_tag]
 
 
 def read_turns(turns_filename):
