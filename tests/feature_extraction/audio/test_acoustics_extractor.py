@@ -7,7 +7,7 @@ import ml.audio_instance
 import ml.signal_processing
 import ml.system
 
-ml.system.mute()
+# ml.system.mute()
 
 class TestAcousticExtractor(TestCase):
     def test_can_extract_from_simple_instance(self):
@@ -53,7 +53,7 @@ class TestAcousticExtractor(TestCase):
                         intensity_config="/home/pbrusco/apps/opensmile-2.3.0/config/intensity.conf",
                         voice_quality_config="/home/pbrusco/apps/opensmile-2.3.0/config/voice_quality.config",
                         extended_features=False,
-                        extract_on_last_seconds=[0.2]
+                        extract_on_last_seconds=[0.2, "all"]
                      )
         extractor = ml.feature_extraction.extractors.create(config)
         here = os.path.dirname(os.path.abspath(__file__))

@@ -8,8 +8,8 @@ from time import gmtime, strftime
 LOGLEVEL = 3
 
 def mute():
+    global LOGLEVEL
     LOGLEVEL = 1
-    info("LOGLEVEL=1")
 
 def home():
     return os.path.expanduser("~")
@@ -105,15 +105,18 @@ def run_script(module, **args):
 
 
 def warning(message):
+    global LOGLEVEL
     if LOGLEVEL > 1:
         print(('\n (WARNING) \x1b[2;33;40m' + message + '\x1b[0m'))
 
 
 def error(message):
+    global LOGLEVEL
     if LOGLEVEL > 0:
         print(('\n (ERROR) \x1b[2;31;43m' + message + '\x1b[0m'))
 
 
 def info(message):
+    global LOGLEVEL
     if LOGLEVEL > 2:
         print(('\n (INFO) \x1b[2;32;40m' + message + '\x1b[0m'))
