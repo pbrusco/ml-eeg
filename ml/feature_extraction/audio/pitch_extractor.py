@@ -70,3 +70,6 @@ class PitchExtractor(feature_extraction.FeatureExtractor):
         pitch = pitch[pitch != 0]
 
         return times, pitch
+
+    def batch_extract(self, instances):
+        return [self.extract(instance) for instance in instances]

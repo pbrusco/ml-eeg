@@ -64,3 +64,6 @@ class IntensityExtractor(feature_extraction.FeatureExtractor):
         intensities = intensities[intensities != 0]
         intensities_in_dbs = 10 * np.log10(intensities / 10e-14)  # TODO: revisar using I0 = 10 −6 as defined in the opensmile book
         return times, intensities_in_dbs
+
+    def batch_extract(self, instances):
+        return [self.extract(instance) for instance in instances]

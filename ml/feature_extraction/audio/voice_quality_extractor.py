@@ -71,3 +71,6 @@ class VoiceQualityExtractor(feature_extraction.FeatureExtractor):
         nhr = float(values["noise_to_harmonics_ratio"]) if "undefined" not in values["noise_to_harmonics_ratio"] else np.nan
 
         return jitter, shimmer, nhr
+
+    def batch_extract(self, instances):
+        return [self.extract(instance) for instance in instances]

@@ -5,6 +5,11 @@ import os.path
 import subprocess
 from time import gmtime, strftime
 
+LOGLEVEL = 3
+
+def mute():
+    LOGLEVEL = 1
+    info("LOGLEVEL=1")
 
 def home():
     return os.path.expanduser("~")
@@ -42,14 +47,14 @@ def rm(filename):
 def run_command(cmd, skip=False, verbose=True):
     if verbose:
         if not skip:
-            print(('\n (running) \x1b[2;32;40m' + cmd + '\x1b[0m'))
+            info("(skiping) {}".format(cmd))
         else:
-            print(('\n (skiping) \x1b[2;33;40m' + cmd + '\x1b[0m'))
+            info("(running) {}".format(cmd))
     if not skip:
         try:
             return subprocess.check_output(cmd, shell=True).decode("utf-8")
         except subprocess.CalledProcessError as e:
-            print(('\n \x1b[2;31;40m (ERROR)' + cmd + '\x1b[0m'))
+            error(cmd)
             raise e
 
 
@@ -89,23 +94,26 @@ def run_script(module, **args):
         cmd += " --{} '{}'".format(arg, val)
 
     if skip:
-        print(('\n (skiping) \x1b[2;33;40m' + cmd + '\x1b[0m'))
+        info("(skiping) {}".format(cmd))
     else:
-        print(('\n (running) \x1b[2;32;40m' + cmd + '\x1b[0m'))
+        info("(running) {}".format(cmd))
         try:
             return module.main(**args)
         except Exception:
-            print(("Error running {} with args {}".format(module.__name__, args)))
+            error(("Running {} with args {}".format(module.__name__, args)))
             raise
 
 
 def warning(message):
-    print(('\n (WARNING) \x1b[2;33;40m' + message + '\x1b[0m'))
+    if LOGLEVEL > 1:
+        print(('\n (WARNING) \x1b[2;33;40m' + message + '\x1b[0m'))
 
 
 def error(message):
-    print(('\n (ERROR) \x1b[2;31;43m' + message + '\x1b[0m'))
+    if LOGLEVEL > 0:
+        print(('\n (ERROR) \x1b[2;31;43m' + message + '\x1b[0m'))
 
 
 def info(message):
-    print(('\n (INFO) \x1b[2;32;40m' + message + '\x1b[0m'))
+    if LOGLEVEL > 2:
+        print(('\n (INFO) \x1b[2;32;40m' + message + '\x1b[0m'))
