@@ -47,9 +47,9 @@ def rm(filename):
 def run_command(cmd, skip=False, verbose=True):
     if verbose:
         if not skip:
-            info("(skiping) {}".format(cmd))
-        else:
             info("(running) {}".format(cmd))
+        else:
+            warning("(skiping) {}".format(cmd))
     if not skip:
         try:
             return subprocess.check_output(cmd, shell=True).decode("utf-8")
@@ -94,7 +94,7 @@ def run_script(module, **args):
         cmd += " --{} '{}'".format(arg, val)
 
     if skip:
-        info("(skiping) {}".format(cmd))
+        warning("(skiping) {}".format(cmd))
     else:
         info("(running) {}".format(cmd))
         try:
