@@ -67,7 +67,7 @@ class VoiceQualityExtractor(feature_extraction.FeatureExtractor):
         try:
             output = system.run_external_command("praat {}".format(script_path), non_named_params=[instance.filename, start, end, min_pitch, max_pitch])
         except:
-            system.warning("Check this case (Extracting voice quality error)!!!!")  # TODO: fix
+            system.warning("Check this case (Extracting voice quality error)!!!!")  
             return np.nan, np.nan, np.nan
 
         values = dict([o.split(":") for o in output.split()])
