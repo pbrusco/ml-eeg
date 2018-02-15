@@ -5,7 +5,7 @@ import os.path
 import inspect
 import ml.utils as utils
 import ml.system as system
-
+import subprocess
 
 class VoiceQualityExtractor(feature_extraction.FeatureExtractor):
 
@@ -13,6 +13,12 @@ class VoiceQualityExtractor(feature_extraction.FeatureExtractor):
         self.params = utils.read_config(config)
         # self.voice_quality_config = self.params["voice_quality_config"]
         self.temp_folder = config["temp_folder"] if "temp_folder" in config else "/tmp/opensmile_arffs/"
+
+        try:
+            subprocess.check_output("praat --version", shell=True, stderr=subprocess.STDOUT)
+        except:
+            raise Exception("Can't find praat executable")
+
         system.mkdir_p(self.temp_folder)
 
     def extract(self, instance):
