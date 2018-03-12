@@ -104,19 +104,26 @@ def run_script(module, **args):
             raise
 
 
-def warning(message):
+def warning(message, background=True):
     global LOGLEVEL
     if LOGLEVEL > 1:
-        print(('\n (WARNING) \x1b[2;33;40m' + message + '\x1b[0m'))
+        if background:
+            print(('\n (WARNING) \x1b[2;33;40m' + message + '\x1b[0m'))
+        else:
+            print(('\n (WARNING) ' + message))
 
-
-def error(message):
+def error(message, background=True):
     global LOGLEVEL
     if LOGLEVEL > 0:
-        print(('\n (ERROR) \x1b[2;31;43m' + message + '\x1b[0m'))
+        if background:
+            print(('\n (ERROR) \x1b[2;31;43m' + message + '\x1b[0m'))
+        else:
+            print(('\n (ERROR) ' + message))
 
-
-def info(message):
+def info(message, background=True):
     global LOGLEVEL
     if LOGLEVEL > 2:
-        print(('\n (INFO) \x1b[2;32;40m' + message + '\x1b[0m'))
+        if background:
+            print(('\n (INFO) \x1b[2;32;40m' + message + '\x1b[0m'))
+        else:
+            print(('\n (INFO) ' + message))
