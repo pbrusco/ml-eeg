@@ -27,7 +27,7 @@ class IntensityExtractor(feature_extraction.FeatureExtractor):
 
         all_values = {}
 
-        all_values["f0_slope"] = collections.defaultdict(lambda: np.nan)
+        all_values["intensity_slope"] = collections.defaultdict(lambda: np.nan)
         all_values["mean_intensity"] = collections.defaultdict(lambda: np.nan)
 
         times_intensity = times_intensity - times_intensity.max() # Alineando a 0.
@@ -42,7 +42,7 @@ class IntensityExtractor(feature_extraction.FeatureExtractor):
             all_values["mean_intensity"][window] = np.mean(intensity[indices])
 
             if sum(indices) > 5: #suficientes valores para calcular slope
-                all_values["f0_slope"][window] = scipy.stats.linregress(times_intensity[indices], intensity[indices])[0]  # [0] => slope (m)
+                all_values["intensity_slope"][window] = scipy.stats.linregress(times_intensity[indices], intensity[indices])[0]  # [0] => slope (m)
 
         feat = {}
         for (w_from, w_to) in windows:
@@ -52,7 +52,7 @@ class IntensityExtractor(feature_extraction.FeatureExtractor):
             else:
                 in_ms = "({},{})".format(int(w_from*1000), int(w_to*1000))
 
-            for feat_name in ["f0_slope", "mean_intensity"]:
+            for feat_name in ["intensity_slope", "mean_intensity"]:
                 feat["{}_{}".format(feat_name, in_ms)] = all_values[feat_name][window]
 
         if self.params["extended_features"]:
