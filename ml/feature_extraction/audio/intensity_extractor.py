@@ -1,10 +1,13 @@
 from .. import feature_extraction
 import collections
+import pysptk
 import numpy as np
+import scipy.stats
 import ml.utils as utils
 import ml.system as system
 import ml.opensmile
 import ml.parsing.arff
+import math
 
 
 class IntensityExtractor(feature_extraction.FeatureExtractor):
@@ -16,41 +19,45 @@ class IntensityExtractor(feature_extraction.FeatureExtractor):
         system.mkdir_p(self.temp_folder)
 
     def extract(self, instance):
-        last_seconds_values = self.params["extract_on_last_seconds"]
+        # last_seconds_values = self.params["extract_on_last_seconds"]
+        windows = self.params["extract_on_windows"]
 
         duration = instance.audio.duration_seconds
-        times_intensities, intensities = self.intensity_track(instance)
+        times_intensity, intensity = self.intensity_track(instance)
 
         all_values = {}
 
+        all_values["f0_slope"] = collections.defaultdict(lambda: np.nan)
         all_values["mean_intensity"] = collections.defaultdict(lambda: np.nan)
 
-        for last_secs in last_seconds_values:
-            if last_secs == "all":
-                last_secs = duration
-                label = "all"
+        times_intensity = times_intensity - times_intensity.max() # Alineando a 0.
+
+        for (w_from, w_to) in windows:
+            window = (w_from, w_to)
+            if not w_from:
+                indices = np.array([True]*len(times_intensity))
             else:
-                label = last_secs
+                indices = (times_intensity >= w_from) & (times_intensity < w_to)
 
-            if duration < last_secs:
-                continue
+            all_values["mean_intensity"][window] = np.mean(intensity[indices])
 
-            indices = (times_intensities >= duration - last_secs)
-            all_values["mean_intensity"][label] = np.mean(intensities[indices])
+            if sum(indices) > 5: #suficientes valores para calcular slope
+                all_values["f0_slope"][window] = scipy.stats.linregress(times_intensity[indices], intensity[indices])[0]  # [0] => slope (m)
 
         feat = {}
-
-        for last_secs in last_seconds_values:
-            if last_secs == "all":
-                in_ms = "all"
+        for (w_from, w_to) in windows:
+            window = (w_from, w_to)
+            if not w_from:
+                in_ms = "all_ipu"
             else:
-                in_ms = "last_{}ms".format(int(last_secs * 1000))
+                in_ms = "({},{})".format(int(w_from*1000), int(w_to*1000))
 
-            feat["mean_intensity_{}".format(in_ms)] = all_values["mean_intensity"][last_secs]
+            for feat_name in ["f0_slope", "mean_intensity"]:
+                feat["{}_{}".format(feat_name, in_ms)] = all_values[feat_name][window]
 
         if self.params["extended_features"]:
-            feat["intensities"] = intensities
-            feat["times_intensities"] = times_intensities
+            feat["intensity"] = intensity
+            feat["times_intensity"] = times_intensity
 
         return feat
 
