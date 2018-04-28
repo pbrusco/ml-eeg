@@ -1,82 +1,84 @@
 from .. import feature_extraction
 import collections
+import pysptk
 import numpy as np
-import os.path
-import inspect
+import scipy.stats
 import ml.utils as utils
 import ml.system as system
-import subprocess
+import ml.opensmile
+import ml.parsing.arff
+import math
 
 class VoiceQualityExtractor(feature_extraction.FeatureExtractor):
-
     def __init__(self, config):
-        self.params = utils.read_config(config)
-        # self.voice_quality_config = self.params["voice_quality_config"]
+        self.params = utils.read_config(config, require=["voice_quality_config"])
         self.temp_folder = config["temp_folder"] if "temp_folder" in config else "/tmp/opensmile_arffs/"
-
-        try:
-            subprocess.check_output("praat --version", shell=True, stderr=subprocess.STDOUT)
-        except:
-            raise Exception("Can't find praat executable")
-
         system.mkdir_p(self.temp_folder)
 
     def extract(self, instance):
-        last_seconds_values = self.params["extract_on_last_seconds"]
+        # last_seconds_values = self.params["extract_on_last_seconds"]
+        windows = self.params["extract_on_windows"]
 
         duration = instance.audio.duration_seconds
-        all_values = {}
+        times, jitter, shimmer, logHNR = self.vq_track(instance)
 
-        all_values["mean_shimmer"] = collections.defaultdict(lambda: np.nan)
-        all_values["mean_jitter"] = collections.defaultdict(lambda: np.nan)
-        all_values["mean_nhr"] = collections.defaultdict(lambda: np.nan)
-
-        for last_secs in last_seconds_values:
-            if last_secs == "all":
-                last_secs = duration
-                label = "all"
-            else:
-                label = last_secs
-
-            if duration < last_secs:
-                continue
-
-            jitter, shimmer, nhr = self.extract_voice_quality(instance, start=duration - last_secs, end=duration)
-            all_values["mean_jitter"][label] = jitter
-            all_values["mean_shimmer"][label] = shimmer
-            all_values["mean_nhr"][label] = nhr
+        times = times - times.max()
 
         feat = {}
 
-        for last_secs in last_seconds_values:
-            if last_secs == "all":
-                in_ms = "all"
-            else:
-                in_ms = "last_{}ms".format(int(last_secs * 1000))
+        if self.params["extended_features"]:
+            feat["times_logHNR"] = times
+            feat["times_shimmer"] = times[shimmer > 0]
+            feat["times_jitter"] = times[jitter > 0]
 
-            for feat_name in ["mean_jitter", "mean_shimmer", "mean_nhr"]:
-                feat["{}_{}".format(feat_name, in_ms)] = all_values[feat_name][last_secs]
+            feat["logHNR"] = logHNR
+            feat["shimmer"] = shimmer[shimmer > 0]
+            feat["jitter"] = jitter[jitter > 0]
+
+        values = dict(jitter=jitter, shimmer=shimmer, logHNR=logHNR)
+
+
+        for klass in ["jitter", "shimmer", "logHNR"]:
+            all_values = {}
+
+            all_values["mean_{}".format(klass)] = collections.defaultdict(lambda: np.nan)
+            all_values["{}_slope".format(klass)] = collections.defaultdict(lambda: np.nan)
+
+            for (w_from, w_to) in windows:
+                window = (w_from, w_to)
+                if not w_from:
+                    indices = np.array([True]*len(times))
+                else:
+                    indices = (times >= w_from) & (times < w_to)
+
+                all_values["mean_{}".format(klass)][window] = np.mean(values[klass][indices])
+
+                if sum(indices) > 5: #suficientes valores para calcular slope
+                    all_values["{}_slope".format(klass)][window] = scipy.stats.linregress(times[indices], values[klass][indices])[0]  # [0] => slope (m)
+
+            for (w_from, w_to) in windows:
+                window = (w_from, w_to)
+                if not w_from:
+                    in_ms = "all_ipu"
+                else:
+                    in_ms = "({},{})".format(int(w_from*1000), int(w_to*1000))
+
+                for feat_name in ["{}_slope".format(klass), "mean_{}".format(klass)]:
+                    feat["{}_{}".format(feat_name, in_ms)] = all_values[feat_name][window]
 
         return feat
 
-    def extract_voice_quality(self, instance, start, end):
-        min_pitch = 50 if instance.speaker_male() else 75
-        max_pitch = 300 if instance.speaker_male() else 500
 
-        script_path = os.path.dirname(inspect.getfile(inspect.currentframe())) + "/voice-analysis.praat"
-        try:
-            output = system.run_external_command("praat {}".format(script_path), non_named_params=[instance.filename, start, end, min_pitch, max_pitch])
-        except:
-            system.warning("Check this case (Extracting voice quality error)!!!!")  
-            return np.nan, np.nan, np.nan
+    def vq_track(self, instance):
+        data = ml.opensmile.call_script(self.params["smile_extract_path"], self.temp_folder, self.params["voice_quality_config"], instance.filename)
 
-        values = dict([o.split(":") for o in output.split()])
+        times = ml.parsing.arff.get_column(data, "frameTime")
+        jitter = ml.parsing.arff.get_column(data, "jitterLocal")
+        shimmer = ml.parsing.arff.get_column(data, "shimmerLocal")
+        logHNR = ml.parsing.arff.get_column(data, "logHNR")
 
-        jitter = float(values["sound_voiced_local_jitter"]) if "undefined" not in values["sound_voiced_local_jitter"] else np.nan
-        shimmer = float(values["sound_voiced_local_shimmer"]) if "undefined" not in values["sound_voiced_local_shimmer"] else np.nan
-        nhr = float(values["noise_to_harmonics_ratio"]) if "undefined" not in values["noise_to_harmonics_ratio"] else np.nan
+        return times, jitter, shimmer, logHNR
 
-        return jitter, shimmer, nhr
 
     def batch_extract(self, instances):
         return [self.extract(instance) for instance in instances]
