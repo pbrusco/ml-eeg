@@ -16,13 +16,19 @@ def handle_nans(nan_action, X, features_names):
         print("FILTERNING NaN rows")
         deleted_rows = nan_rows
 
-    if nan_action in ["replace_by_zero", "replace_by_mean", "replace_by_median"]:
+    if nan_action in ["replace_by_zero", "replace_by_mean", "replace_by_median", "replace_by_inf"]:
         X = np.hstack([X, np.isnan(X) * 1.0])
-        features_names = features_names + ["was_nan" + f for f in features_names]
+        features_names = features_names + ["was_nan_" + f for f in features_names]
 
     if nan_action == "replace_by_zero":
         print(("converting {} NaN to 0s".format(np.count_nonzero(~np.isnan(X)))))
         X = np.nan_to_num(X)
+
+    if nan_action == "replace_by_inf":
+        print(("converting {} NaN to large numbers".format(np.count_nonzero(~np.isnan(X)))))
+        thresh = np.nanmax(np.abs(X), axis=0)
+        inds = np.where(np.isnan(X))
+        X[inds] = np.take(thresh*100, inds[1])
 
     if nan_action == "replace_by_mean":
         col_mean = np.nanmean(X, axis=0)

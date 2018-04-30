@@ -8,8 +8,14 @@ from time import gmtime, strftime
 LOGLEVEL = 3
 
 def mute():
+     set_log_level(1)
+
+def set_log_level(lvl):
+    # 1 errores
+    # 2 errores + warnings
+    # 3 errores + warnings + info
     global LOGLEVEL
-    LOGLEVEL = 1
+    LOGLEVEL=lvl
 
 def home():
     return os.path.expanduser("~")
@@ -39,8 +45,6 @@ def cp(src, dst):
 
 
 def rm(filename):
-    if exists(filename):
-        warning("removing {}".format(filename))
     run_external_command("rm", non_named_params=[filename])
 
 
