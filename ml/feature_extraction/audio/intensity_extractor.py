@@ -1,13 +1,11 @@
 from .. import feature_extraction
 import collections
-import pysptk
 import numpy as np
 import scipy.stats
 import ml.utils as utils
 import ml.system as system
 import ml.opensmile
 import ml.parsing.arff
-import math
 
 
 class IntensityExtractor(feature_extraction.FeatureExtractor):
@@ -22,7 +20,6 @@ class IntensityExtractor(feature_extraction.FeatureExtractor):
         # last_seconds_values = self.params["extract_on_last_seconds"]
         windows = self.params["extract_on_windows"]
 
-        duration = instance.audio.duration_seconds
         times_intensity, intensity = self.intensity_track(instance)
 
         all_values = {}
@@ -30,18 +27,18 @@ class IntensityExtractor(feature_extraction.FeatureExtractor):
         all_values["intensity_slope"] = collections.defaultdict(lambda: np.nan)
         all_values["mean_intensity"] = collections.defaultdict(lambda: np.nan)
 
-        times_intensity = times_intensity - times_intensity.max() # Alineando a 0.
+        times_intensity = times_intensity - times_intensity.max()  # Alineando a 0.
 
         for (w_from, w_to) in windows:
             window = (w_from, w_to)
             if not w_from:
-                indices = np.array([True]*len(times_intensity))
+                indices = np.array([True] * len(times_intensity))
             else:
                 indices = (times_intensity >= w_from) & (times_intensity < w_to)
 
             all_values["mean_intensity"][window] = np.mean(intensity[indices])
 
-            if sum(indices) > 5: #suficientes valores para calcular slope
+            if sum(indices) > 2:  # suficientes valores para calcular slope
                 all_values["intensity_slope"][window] = scipy.stats.linregress(times_intensity[indices], intensity[indices])[0]  # [0] => slope (m)
 
         feat = {}
@@ -50,7 +47,7 @@ class IntensityExtractor(feature_extraction.FeatureExtractor):
             if not w_from:
                 in_ms = "all_ipu"
             else:
-                in_ms = "({},{})".format(int(w_from*1000), int(w_to*1000))
+                in_ms = "({},{})".format(int(w_from * 1000), int(w_to * 1000))
 
             for feat_name in ["intensity_slope", "mean_intensity"]:
                 feat["{}_{}".format(feat_name, in_ms)] = all_values[feat_name][window]

@@ -1,13 +1,11 @@
 from .. import feature_extraction
 import collections
-import pysptk
 import numpy as np
 import scipy.stats
 import ml.utils as utils
 import ml.system as system
 import ml.opensmile
 import ml.parsing.arff
-import math
 
 
 class PitchExtractor(feature_extraction.FeatureExtractor):
@@ -20,25 +18,24 @@ class PitchExtractor(feature_extraction.FeatureExtractor):
         # last_seconds_values = self.params["extract_on_last_seconds"]
         windows = self.params["extract_on_windows"]
 
-        duration = instance.audio.duration_seconds
         times_pitch, pitch = self.pitch_track(instance)
 
         all_values = {}
 
         all_values["pitch_slope"] = collections.defaultdict(lambda: np.nan)
         all_values["mean_pitch"] = collections.defaultdict(lambda: np.nan)
-        times_pitch = times_pitch - times_pitch.max() # Alineando a 0.
+        times_pitch = times_pitch - times_pitch.max()  # Alineando a 0.
 
         for (w_from, w_to) in windows:
             window = (w_from, w_to)
             if not w_from:
-                indices = np.array([True]*len(times_pitch))
+                indices = np.array([True] * len(times_pitch))
             else:
                 indices = (times_pitch >= w_from) & (times_pitch < w_to)
 
             all_values["mean_pitch"][window] = np.mean(pitch[indices])
 
-            if sum(indices) > 5: #suficientes valores para calcular slope
+            if sum(indices) > 2:  # suficientes valores para calcular slope
                 all_values["pitch_slope"][window] = scipy.stats.linregress(times_pitch[indices], pitch[indices])[0]  # [0] => slope (m)
 
         feat = {}
@@ -47,7 +44,7 @@ class PitchExtractor(feature_extraction.FeatureExtractor):
             if not w_from:
                 in_ms = "all_ipu"
             else:
-                in_ms = "({},{})".format(int(w_from*1000), int(w_to*1000))
+                in_ms = "({},{})".format(int(w_from * 1000), int(w_to * 1000))
 
             for feat_name in ["pitch_slope", "mean_pitch"]:
                 feat["{}_{}".format(feat_name, in_ms)] = all_values[feat_name][window]
