@@ -10,7 +10,8 @@ def call_script(smile_extract_path, temp_folder, config, filename):
     data = {}
     if not system.exists(config):
         raise Exception("{} not found".format(config))
-    command = "{}/SMILExtract -C {} -I {} -l 0 -arffoutput {} -appendarff 0".format(smile_extract_path, config, filename, temp_output)
+    command = "{}/SMILExtract -C {} -I {} -l 0 -arffoutput {} -appendarff 0 -noconsoleoutput 1 -appendLogfile 1".format(smile_extract_path, config, filename, temp_output)
+    print(command)
     system.run_command(command)
     data = arff.load(open(temp_output))
 
